@@ -1,0 +1,4315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Full-Stack Product App — API → Angular → React</title>
+<style>
+:root {
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  --bg: #fbfbfa; --fg: #1f2328; --muted: #59636e; --card: #ffffff; --border: #d8dee4;
+  --accent: #0b6bcb; --code-bg: #f3f4f6; --pre-bg: #0f172a; --pre-fg: #e2e8f0; --th: #eef2f6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1117; --fg: #e6edf3; --muted: #9da7b3; --card: #161b22; --border: #30363d;
+    --accent: #58a6ff; --code-bg: #1f2630; --pre-bg: #010409; --pre-fg: #e6edf3; --th: #1c232c;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1117; --fg: #e6edf3; --muted: #9da7b3; --card: #161b22; --border: #30363d;
+  --accent: #58a6ff; --code-bg: #1f2630; --pre-bg: #010409; --pre-fg: #e6edf3; --th: #1c232c;
+}
+*, *::before, *::after { box-sizing: inherit; }
+html { scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 16px); scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg);
+  font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+.layout { display: grid; grid-template-columns: 290px minmax(0, 1fr); max-width: 1400px; margin: 0 auto; }
+nav.toc { position: sticky; top: env(safe-area-inset-top, 0px); height: 100vh; overflow-y: auto; padding: 24px 16px;
+  border-right: 1px solid var(--border); font-size: 14px; }
+nav.toc .title { font-weight: 700; margin-bottom: 12px; }
+nav.toc ul { list-style: none; padding-left: 0; margin: 0; }
+nav.toc ul ul { padding-left: 14px; }
+nav.toc li { margin: 3px 0; }
+nav.toc a { color: var(--muted); text-decoration: none; }
+nav.toc a:hover { color: var(--accent); }
+nav.toc > ul > li > a { color: var(--fg); font-weight: 600; }
+main { padding: 32px 40px 80px; min-width: 0; }
+h1 { font-size: 2rem; border-bottom: 2px solid var(--border); padding-bottom: 8px; margin-top: 2.2em; }
+h1:first-child { margin-top: 0; }
+h2 { font-size: 1.45rem; margin-top: 2em; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+h3 { font-size: 1.15rem; margin-top: 1.6em; }
+a { color: var(--accent); }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 0.88em;
+  background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+pre { position: relative; background: var(--pre-bg); color: var(--pre-fg); padding: 16px; border-radius: 8px;
+  overflow-x: auto; font-size: 13.5px; line-height: 1.5; }
+pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+.copy { position: absolute; top: 8px; right: 8px; font-size: 12px; padding: 3px 9px; border-radius: 5px;
+  border: 1px solid #475569; background: #1e293b; color: #e2e8f0; cursor: pointer; opacity: .85; }
+.copy:hover { opacity: 1; }
+.tw { overflow-x: auto; margin: 1em 0; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td { border: 1px solid var(--border); padding: 7px 10px; text-align: left; vertical-align: top; }
+th { background: var(--th); }
+blockquote { margin: 1em 0; padding: 8px 16px; border-left: 4px solid var(--accent); background: var(--card); color: var(--muted); }
+li.task { list-style: none; margin-left: -1.3em; }
+li.task input { margin-right: 6px; }
+img { max-width: 100%; }
+.theme-btn { position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 10;
+  border: 1px solid var(--border); background: var(--card); color: var(--fg); border-radius: 20px; padding: 6px 12px; cursor: pointer; }
+.menu-btn { display: none; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: fixed; inset: 0; z-index: 20; background: var(--bg); height: 100%; display: none;
+    padding-top: calc(24px + env(safe-area-inset-top, 0px)); }
+  nav.toc.open { display: block; }
+  main { padding: 20px 16px 80px; }
+  .menu-btn { display: block; position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 30;
+    border: 1px solid var(--border); background: var(--card); color: var(--fg); border-radius: 20px; padding: 6px 12px; cursor: pointer; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="toc" id="toc"><div class="title">Contents</div><div class="toc">
+<ul>
+<li><a href="#full-stack-product-app-api-angular-react">Full-Stack Product App — API → Angular → React</a></li>
+<li><a href="#part-0-the-big-picture-read-this-first">PART 0 — The big picture (read this first)</a><ul>
+<li><a href="#01-how-a-modern-web-app-works">0.1 How a modern web app works</a></li>
+<li><a href="#02-http-status-codes-youll-use">0.2 HTTP status codes you'll use</a></li>
+<li><a href="#03-the-request-lifecycle-the-most-important-diagram">0.3 The request lifecycle (the most important diagram)</a></li>
+<li><a href="#04-the-three-other-flows-youll-implement">0.4 The three other flows you'll implement</a></li>
+<li><a href="#05-what-a-modern-web-developer-should-learn">0.5 What a modern web developer should learn</a></li>
+<li><a href="#06-repository-layout-one-git-repo-three-apps">0.6 Repository layout (one Git repo, three apps)</a></li>
+</ul>
+</li>
+<li><a href="#part-1-the-api-aspnet-core">PART 1 — The API (ASP.NET Core)</a><ul>
+<li><a href="#10-concepts-for-this-part">1.0 Concepts for this part</a></li>
+<li><a href="#11-endpoints-youll-build">1.1 Endpoints you'll build</a></li>
+<li><a href="#12-create-the-project">1.2 Create the project</a></li>
+<li><a href="#13-configuration-and-secrets">1.3 Configuration and secrets</a></li>
+<li><a href="#14-entities-your-schema-as-c-classes">1.4 Entities (your schema as C# classes)</a></li>
+<li><a href="#15-the-dbcontext">1.5 The DbContext</a></li>
+<li><a href="#16-common-building-blocks">1.6 Common building blocks</a></li>
+<li><a href="#17-dtos-the-apis-contract-with-both-clients">1.7 DTOs (the API's contract with both clients)</a></li>
+<li><a href="#18-services-business-logic">1.8 Services (business logic)</a></li>
+<li><a href="#19-infrastructure">1.9 Infrastructure</a></li>
+<li><a href="#110-programcs-di-registrations-middleware-pipeline">1.10 Program.cs (DI registrations + middleware pipeline)</a></li>
+<li><a href="#111-migrations-create-the-database-from-code">1.11 Migrations: create the database from code</a></li>
+<li><a href="#112-controllers-thin-http-in-http-out">1.12 Controllers (thin: HTTP in, HTTP out)</a></li>
+<li><a href="#113-run-and-test-the-api">1.13 Run and test the API</a></li>
+</ul>
+</li>
+<li><a href="#part-2-angular-client">PART 2 — Angular Client</a><ul>
+<li><a href="#20-modern-angular-concepts">2.0 Modern Angular concepts</a></li>
+<li><a href="#21-create-the-project">2.1 Create the project</a></li>
+<li><a href="#22-folder-structure">2.2 Folder structure</a></li>
+<li><a href="#23-models-mirror-the-api-dtos">2.3 Models (mirror the API DTOs)</a></li>
+<li><a href="#24-error-helper">2.4 Error helper</a></li>
+<li><a href="#25-services">2.5 Services</a></li>
+<li><a href="#26-interceptor-token-silent-refresh">2.6 Interceptor (token + silent refresh)</a></li>
+<li><a href="#27-guards">2.7 Guards</a></li>
+<li><a href="#28-routes-and-app-configuration">2.8 Routes and app configuration</a></li>
+<li><a href="#29-app-shell-navbar">2.9 App shell (navbar)</a></li>
+<li><a href="#210-login-and-register">2.10 Login and Register</a></li>
+<li><a href="#211-product-list-search-filter-sort-paging-delete">2.11 Product list (search, filter, sort, paging, delete)</a></li>
+<li><a href="#212-product-form-create-edit-in-one-component">2.12 Product form (create + edit in one component)</a></li>
+<li><a href="#213-run-it">2.13 Run it</a></li>
+</ul>
+</li>
+<li><a href="#part-3-react-client">PART 3 — React Client</a><ul>
+<li><a href="#30-modern-react-concepts">3.0 Modern React concepts</a></li>
+<li><a href="#31-create-the-project">3.1 Create the project</a></li>
+<li><a href="#32-folder-structure">3.2 Folder structure</a></li>
+<li><a href="#33-types">3.3 Types</a></li>
+<li><a href="#34-api-layer">3.4 API layer</a></li>
+<li><a href="#35-auth-state-with-context">3.5 Auth state with Context</a></li>
+<li><a href="#36-data-hooks-tanstack-query">3.6 Data hooks (TanStack Query)</a></li>
+<li><a href="#37-components">3.7 Components</a></li>
+<li><a href="#38-pages">3.8 Pages</a></li>
+<li><a href="#39-app-and-entry-point">3.9 App and entry point</a></li>
+<li><a href="#310-run-it">3.10 Run it</a></li>
+</ul>
+</li>
+<li><a href="#part-4-after-it-works">PART 4 — After it works</a><ul>
+<li><a href="#41-compare-what-you-built">4.1 Compare what you built</a></li>
+<li><a href="#42-production-builds">4.2 Production builds</a></li>
+<li><a href="#43-common-problems-all-three-parts">4.3 Common problems (all three parts)</a></li>
+<li><a href="#44-your-next-learning-steps-in-order">4.4 Your next learning steps (in order)</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav>
+<main><h1 id="full-stack-product-app-api-angular-react">Full-Stack Product App — API → Angular → React</h1>
+<p><strong>One schema, one API, two modern clients, built the way industry teams build them today.</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Technology</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Database</td>
+<td>SQL Server (LocalDB)</td>
+</tr>
+<tr>
+<td>API</td>
+<td>ASP.NET Core Web API (.NET 10 LTS, notes for .NET 9), EF Core Code First, Identity, JWT</td>
+</tr>
+<tr>
+<td>Client 1</td>
+<td>Angular (latest: standalone components, signals, new control flow, functional interceptors)</td>
+</tr>
+<tr>
+<td>Client 2</td>
+<td>React 19 + Vite + TypeScript, TanStack Query, React Hook Form + Zod, React Router</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Your schema (used everywhere):</strong></p>
+<pre><code>Categories (CategoryId PK, CategoryName)
+    │ 1
+    │ many
+Products (ProductId PK, ProductName, ManufacturingDate, SerialNo, ImageUrl,
+          IsAvailable, CategoryId FK, Price)
+    │ 1
+    │ many   (ON DELETE CASCADE)
+Brands (BrandId PK, BrandName, Stock, ProductId FK)
+</code></pre>
+<p><strong>A realistic timeline.</strong> Doing all three parts in one day is very ambitious. A realistic plan:</p>
+<ul>
+<li><strong>Day 1:</strong> Part 0 + Part 1 (the API).</li>
+<li><strong>Day 2:</strong> Part 2 (Angular).</li>
+<li><strong>Day 3:</strong> Part 3 (React).</li>
+</ul>
+<p>The React part goes fastest, because by then you'll understand the API and the patterns.</p>
+<hr />
+<h1 id="part-0-the-big-picture-read-this-first">PART 0 — The big picture (read this first)</h1>
+<h2 id="01-how-a-modern-web-app-works">0.1 How a modern web app works</h2>
+<pre><code>┌──────────────────────┐        HTTPS + JSON         ┌───────────────────────┐        SQL        ┌──────────────┐
+│  Browser              │ ─────────────────────────▶ │  ASP.NET Core Web API │ ────────────────▶ │  SQL Server  │
+│  Angular or React SPA │ ◀───────────────────────── │  (stateless)          │ ◀──────────────── │  ProductHubDB│
+└──────────────────────┘   Authorization: Bearer JWT └───────────────────────┘    EF Core        └──────────────┘
+   localhost:4200 (Ng)                                   localhost:7001
+   localhost:5173 (React)
+</code></pre>
+<p><strong>Key terms:</strong></p>
+<ul>
+<li><strong>SPA (Single Page Application):</strong> the browser downloads the app once. After that, it only exchanges <strong>JSON</strong> with the API, never full HTML pages. Angular and React both build SPAs.</li>
+<li><strong>REST API:</strong> URLs name <em>resources</em> (<code>/api/products/5</code>), and HTTP verbs say what to do with them (GET read, POST create, PUT update, DELETE remove).</li>
+<li><strong>Stateless:</strong> the API remembers nothing between requests. Each request proves who the user is by carrying a <strong>JWT</strong> in the <code>Authorization</code> header.</li>
+<li><strong>CORS:</strong> browsers block calls from one origin (<code>localhost:4200</code>) to another (<code>localhost:7001</code>) unless the API explicitly allows that origin.</li>
+</ul>
+<h2 id="02-http-status-codes-youll-use">0.2 HTTP status codes you'll use</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+<th>When this API returns it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>200 OK</td>
+<td>Success with data</td>
+<td>GET, PUT, login</td>
+</tr>
+<tr>
+<td>201 Created</td>
+<td>New resource created</td>
+<td>POST product (with a <code>Location</code> header)</td>
+</tr>
+<tr>
+<td>204 No Content</td>
+<td>Success, nothing to return</td>
+<td>DELETE, logout</td>
+</tr>
+<tr>
+<td>400 Bad Request</td>
+<td>Invalid input</td>
+<td>Validation failed</td>
+</tr>
+<tr>
+<td>401 Unauthorized</td>
+<td>Not logged in / token invalid or expired</td>
+<td>Missing or expired JWT</td>
+</tr>
+<tr>
+<td>403 Forbidden</td>
+<td>Logged in, but not allowed</td>
+<td>A "User" tries an Admin action</td>
+</tr>
+<tr>
+<td>404 Not Found</td>
+<td>Doesn't exist</td>
+<td>Wrong product ID</td>
+</tr>
+<tr>
+<td>409 Conflict</td>
+<td>Clashes with existing data</td>
+<td>Duplicate serial number</td>
+</tr>
+<tr>
+<td>429 Too Many Requests</td>
+<td>Rate limited</td>
+<td>Too many login attempts</td>
+</tr>
+<tr>
+<td>500 Server Error</td>
+<td>Bug or crash</td>
+<td>An unexpected exception</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="03-the-request-lifecycle-the-most-important-diagram">0.3 The request lifecycle (the most important diagram)</h2>
+<p>What happens when an <strong>Admin clicks "Save"</strong> on the product form:</p>
+<pre><code>CLIENT (Angular / React)
+ 1. Form validates input locally (instant feedback, no network)
+ 2. Service/API function builds a JSON body: { productName, brands: [...], ... }
+ 3. Interceptor adds header  →  Authorization: Bearer eyJhbGciOi...
+ 4. Browser sends a CORS preflight (OPTIONS) first, then the real POST
+                         │
+                         ▼
+API MIDDLEWARE PIPELINE (Program.cs, in this exact order)
+ 5. ExceptionHandler   catches any crash below and turns it into JSON ProblemDetails
+ 6. HTTPS redirection
+ 7. Static files       (only for /images/... requests)
+ 8. Routing            finds the matching controller action
+ 9. CORS               is this origin allowed?
+10. Rate limiter       too many requests from this IP?
+11. Authentication     reads the JWT, checks signature + expiry → &quot;who are you?&quot;
+12. Authorization      [Authorize(Roles = &quot;Admin&quot;)] → &quot;are you allowed?&quot;
+                         │
+                         ▼
+13. Model binding      JSON → ProductRequest object
+14. Validation         Data Annotations run automatically → 400 if invalid
+15. Controller         thin: calls the service, picks the status code
+16. Service            business rules (does the category exist?) + entity mapping
+17. EF Core            builds SQL → INSERT Products, INSERT Brands (one transaction)
+18. SQL Server         stores rows, returns new IDs
+                         │
+                         ▼
+19. Service maps the entity → ProductResponse DTO
+20. Controller returns 201 Created + JSON
+21. Client receives the JSON → updates state → UI re-renders → navigates to the list
+</code></pre>
+<h2 id="04-the-three-other-flows-youll-implement">0.4 The three other flows you'll implement</h2>
+<p><strong>Login</strong></p>
+<pre><code>Login form → POST /api/auth/login { email, password }
+API: find user → check hashed password (lockout after 5 failures) → create JWT (15 min)
+     + refresh token (7 days, stored HASHED in DB)
+Client stores { accessToken, refreshToken, user } → shows the user's name, Admin buttons, etc.
+</code></pre>
+<p><strong>Silent token refresh (when the access token expires)</strong></p>
+<pre><code>Any request → 401 (token expired)
+Interceptor catches the 401 → POST /api/auth/refresh { refreshToken }
+API: old refresh token revoked → new pair issued (&quot;rotation&quot;)
+Interceptor saves the new tokens → retries the original request → the user notices nothing
+If refresh fails → clear tokens → redirect to /login
+</code></pre>
+<p><strong>Image upload (two-step, keeps the product save as plain JSON)</strong></p>
+<pre><code>User picks a file → POST /api/products/upload (multipart, field &quot;file&quot;)
+API validates type/size → saves wwwroot/images/{guid}.jpg → returns { fileName, url }
+Client puts fileName into the form's hidden &quot;imageFileName&quot; field and shows the preview from url
+On Save, the product JSON includes imageFileName → stored in Products.ImageUrl
+</code></pre>
+<h2 id="05-what-a-modern-web-developer-should-learn">0.5 What a modern web developer should learn</h2>
+<p>✅ = covered in this guide · ➕ = the next step after this guide</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Topics</th>
+<th>Here</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Fundamentals</strong></td>
+<td>HTML, CSS (flexbox/grid, responsive), JavaScript (ES2015+, async/await, modules), TypeScript</td>
+<td>Used throughout; learn the basics alongside</td>
+</tr>
+<tr>
+<td><strong>Tools</strong></td>
+<td>Git + GitHub, terminal, VS Code, npm, browser DevTools (Network tab!)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>HTTP &amp; REST</strong></td>
+<td>Verbs, status codes, headers, JSON, CORS, idempotency</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Backend</strong></td>
+<td>Controllers, DI, middleware, options, DTOs, validation, services, async</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Data</strong></td>
+<td>SQL, relationships, EF Core Code First, migrations, LINQ, paging/filtering/sorting</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Security</strong></td>
+<td>Password hashing, JWT, refresh tokens, roles, CORS, rate limiting, secrets, upload safety, OWASP Top 10</td>
+<td>✅ (OWASP ➕)</td>
+</tr>
+<tr>
+<td><strong>API quality</strong></td>
+<td>ProblemDetails errors, OpenAPI docs, health checks, logging</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Frontend framework</strong></td>
+<td>Components, state, routing, forms, HTTP, interceptors, guards</td>
+<td>✅ Angular + React</td>
+</tr>
+<tr>
+<td><strong>State management</strong></td>
+<td>Signals (Angular), TanStack Query + Context (React)</td>
+<td>✅ (NgRx/Redux ➕)</td>
+</tr>
+<tr>
+<td><strong>Styling</strong></td>
+<td>Bootstrap; Tailwind CSS</td>
+<td>✅ / ➕</td>
+</tr>
+<tr>
+<td><strong>Testing</strong></td>
+<td>Unit (xUnit, Vitest), integration, end-to-end (Playwright)</td>
+<td>➕</td>
+</tr>
+<tr>
+<td><strong>DevOps</strong></td>
+<td>Docker, CI/CD (GitHub Actions), cloud deployment (Azure/AWS), environments</td>
+<td>➕</td>
+</tr>
+<tr>
+<td><strong>Performance &amp; UX</strong></td>
+<td>Lazy loading, caching, accessibility (a11y)</td>
+<td>Partly ✅</td>
+</tr>
+<tr>
+<td><strong>AI-assisted development</strong></td>
+<td>Using AI tools effectively and <em>verifying</em> their output</td>
+<td>Use, but always understand the code</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="06-repository-layout-one-git-repo-three-apps">0.6 Repository layout (one Git repo, three apps)</h2>
+<pre><code>ProductHub/
+├─ ProductApi/          ← Part 1 (.NET)
+├─ product-angular/     ← Part 2
+└─ product-react/       ← Part 3
+</code></pre>
+<p>Before you start:</p>
+<ol>
+<li>Install <strong>Git</strong>.</li>
+<li>Create the <code>ProductHub</code> folder and run <code>git init</code> inside it.</li>
+<li>Commit after every working step, e.g. <code>git commit -m "feat(api): add products controller"</code>.</li>
+</ol>
+<hr />
+<h1 id="part-1-the-api-aspnet-core">PART 1 — The API (ASP.NET Core)</h1>
+<h2 id="10-concepts-for-this-part">1.0 Concepts for this part</h2>
+<ul>
+<li><strong>Code First vs Database First.</strong> In Database First (your exam), you write SQL and EF generates classes. In <strong>Code First</strong>, you write C# classes and EF generates the database through <strong>migrations</strong>. Most teams use Code First for new projects, because the schema lives in source control and evolves through reviewable migration files. Database First is mainly used when the database already exists.</li>
+<li><strong>Layering:</strong> Controller (HTTP) → Service (business logic) → DbContext (data). Each layer has one job, which makes the code easy to change and test.</li>
+<li><strong>DTOs (Data Transfer Objects):</strong> the shapes the API sends and receives. Entities never leave the API, which prevents serialization loops, hides internal columns, and lets the database change without breaking clients.</li>
+<li><strong>Dependency Injection (DI):</strong> classes ask for what they need in their constructor (<code>ProductService(AppDbContext db, ...)</code>), and ASP.NET Core provides it. You register services once, in <code>Program.cs</code>.</li>
+<li><strong>Async everywhere:</strong> every database call is <code>await</code>ed. While SQL Server works, the thread serves other requests.</li>
+</ul>
+<h2 id="11-endpoints-youll-build">1.1 Endpoints you'll build</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Method</th>
+<th>URL</th>
+<th>Who</th>
+<th>Body → Response</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td><code>/api/auth/register</code></td>
+<td>Anyone (rate-limited)</td>
+<td>RegisterRequest → AuthResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/auth/login</code></td>
+<td>Anyone (rate-limited)</td>
+<td>LoginRequest → AuthResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/auth/refresh</code></td>
+<td>Anyone (rate-limited)</td>
+<td>RefreshRequest → AuthResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/auth/logout</code></td>
+<td>Logged in</td>
+<td>RefreshRequest → 204</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/auth/me</code></td>
+<td>Logged in</td>
+<td>→ UserDto</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/categories</code></td>
+<td>Anyone</td>
+<td>→ CategoryResponse[]</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/products?search=&amp;categoryId=&amp;sortBy=&amp;sortDir=&amp;page=&amp;pageSize=</code></td>
+<td>Anyone</td>
+<td>→ PagedResult<ProductResponse></td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/products/{id}</code></td>
+<td>Anyone</td>
+<td>→ ProductResponse</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/products</code></td>
+<td>Admin</td>
+<td>ProductRequest → 201 ProductResponse</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/products/{id}</code></td>
+<td>Admin</td>
+<td>ProductRequest → 200 ProductResponse</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/products/{id}</code></td>
+<td>Admin</td>
+<td>→ 204</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/products/upload</code></td>
+<td>Admin</td>
+<td>multipart <code>file</code> → <code>{ fileName, url }</code></td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/health</code></td>
+<td>Anyone</td>
+<td>→ Healthy</td>
+</tr>
+</tbody>
+</table></div>
+<p>Anyone can browse products. Registered users get the <strong>User</strong> role. Only the seeded <strong>Admin</strong> can create, edit or delete.</p>
+<h2 id="12-create-the-project">1.2 Create the project</h2>
+<ol>
+<li>Install Visual Studio 2026 (or 2022 17.14+) with the <strong>ASP.NET and web development</strong> workload, or the .NET SDK + VS Code.</li>
+<li>New Project → <strong>ASP.NET Core Web API</strong>.</li>
+<li>Name <code>ProductApi</code>, location the <code>ProductHub</code> folder.</li>
+<li>Framework <strong>.NET 10 (LTS)</strong>, or .NET 9 if that's what you have.</li>
+<li>Authentication <strong>None</strong>. Tick <strong>Configure for HTTPS</strong>, <strong>Enable OpenAPI support</strong> and <strong>Use controllers</strong>.</li>
+<li>Delete <code>WeatherForecast.cs</code> and <code>Controllers/WeatherForecastController.cs</code>.</li>
+<li>Create the folders: <code>Entities</code>, <code>Data</code>, <code>Dtos</code>, <code>Services</code>, <code>Common</code>, <code>Infrastructure</code>, <code>wwwroot/images</code>.</li>
+<li>Put a placeholder image at <code>wwwroot/images/noimage.png</code>.</li>
+</ol>
+<p>Install the packages (Terminal, inside the project folder; use the version matching your framework: 10.x or 9.x):</p>
+<pre><code class="language-bash">dotnet add package Microsoft.EntityFrameworkCore.SqlServer
+dotnet add package Microsoft.EntityFrameworkCore.Tools
+dotnet add package Microsoft.EntityFrameworkCore.Design
+dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore
+dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
+dotnet add package Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore
+dotnet add package Scalar.AspNetCore
+</code></pre>
+<p>If you're on .NET 9, add <code>--version 9.0.*</code> to the Microsoft packages so they don't pull 10.x.</p>
+<h2 id="13-configuration-and-secrets">1.3 Configuration and secrets</h2>
+<p><strong>appsettings.json</strong></p>
+<pre><code class="language-json">{
+  &quot;Logging&quot;: {
+    &quot;LogLevel&quot;: { &quot;Default&quot;: &quot;Information&quot;, &quot;Microsoft.AspNetCore&quot;: &quot;Warning&quot; }
+  },
+  &quot;AllowedHosts&quot;: &quot;*&quot;,
+  &quot;ConnectionStrings&quot;: {
+    &quot;DefaultConnection&quot;: &quot;Server=(LocalDB)\\MSSQLLocalDB;Database=ProductHubDB;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True&quot;
+  },
+  &quot;Jwt&quot;: {
+    &quot;Issuer&quot;: &quot;ProductApi&quot;,
+    &quot;Audience&quot;: &quot;ProductClients&quot;,
+    &quot;Key&quot;: &quot;&quot;,
+    &quot;AccessTokenMinutes&quot;: 15,
+    &quot;RefreshTokenDays&quot;: 7
+  },
+  &quot;Cors&quot;: {
+    &quot;AllowedOrigins&quot;: [ &quot;http://localhost:4200&quot;, &quot;http://localhost:5173&quot; ]
+  },
+  &quot;SeedAdmin&quot;: {
+    &quot;Email&quot;: &quot;admin@producthub.com&quot;,
+    &quot;FullName&quot;: &quot;System Admin&quot;,
+    &quot;Password&quot;: &quot;&quot;
+  }
+}
+</code></pre>
+<p><strong>Secrets go in User Secrets, never in appsettings or Git.</strong> Right-click the project → <strong>Manage User Secrets</strong>:</p>
+<pre><code class="language-json">{
+  &quot;Jwt:Key&quot;: &quot;REPLACE-WITH-64-RANDOM-CHARACTERS-0123456789abcdefghijklmnopqrstuvwxyzABCDEF&quot;,
+  &quot;SeedAdmin:Password&quot;: &quot;Admin@12345&quot;
+}
+</code></pre>
+<ul>
+<li><strong>The JWT key must be at least 32 characters</strong> (HS256 needs 256 bits). Shorter keys crash at runtime with <code>IDX10720</code>.</li>
+<li><strong>In production,</strong> the same keys come from environment variables or a vault (e.g. Azure Key Vault). The code doesn't change; only where the value lives.</li>
+</ul>
+<h2 id="14-entities-your-schema-as-c-classes">1.4 Entities (your schema as C# classes)</h2>
+<p><strong>Entities/Category.cs</strong></p>
+<pre><code class="language-csharp">namespace ProductApi.Entities;
+
+public class Category
+{
+    public int CategoryId { get; set; }
+    public string CategoryName { get; set; } = string.Empty;
+    public List&lt;Product&gt; Products { get; set; } = [];
+}
+</code></pre>
+<p><strong>Entities/Product.cs</strong></p>
+<pre><code class="language-csharp">namespace ProductApi.Entities;
+
+public class Product
+{
+    public int ProductId { get; set; }
+    public string ProductName { get; set; } = string.Empty;
+    public DateTime ManufacturingDate { get; set; }
+    public string SerialNo { get; set; } = string.Empty;
+    public string ImageUrl { get; set; } = string.Empty;   // stores the file name, e.g. &quot;3f2a....jpg&quot;
+    public bool IsAvailable { get; set; }
+    public int CategoryId { get; set; }
+    public decimal Price { get; set; }
+
+    public Category Category { get; set; } = null!;
+    public List&lt;Brand&gt; Brands { get; set; } = [];
+}
+</code></pre>
+<p><strong>Entities/Brand.cs</strong></p>
+<pre><code class="language-csharp">namespace ProductApi.Entities;
+
+public class Brand
+{
+    public int BrandId { get; set; }
+    public string BrandName { get; set; } = string.Empty;
+    public int Stock { get; set; }
+    public int ProductId { get; set; }
+    public Product Product { get; set; } = null!;
+}
+</code></pre>
+<p><strong>Entities/AppUser.cs</strong></p>
+<pre><code class="language-csharp">using Microsoft.AspNetCore.Identity;
+
+namespace ProductApi.Entities;
+
+public class AppUser : IdentityUser
+{
+    public string FullName { get; set; } = string.Empty;
+    public List&lt;RefreshToken&gt; RefreshTokens { get; set; } = [];
+}
+</code></pre>
+<p><strong>Entities/RefreshToken.cs</strong></p>
+<pre><code class="language-csharp">namespace ProductApi.Entities;
+
+public class RefreshToken
+{
+    public int Id { get; set; }
+    public string UserId { get; set; } = string.Empty;
+    public string TokenHash { get; set; } = string.Empty;   // SHA-256 hash; the raw token is never stored
+    public DateTime CreatedAt { get; set; }
+    public DateTime ExpiresAt { get; set; }
+    public DateTime? RevokedAt { get; set; }
+    public AppUser User { get; set; } = null!;
+}
+</code></pre>
+<p><strong>EF conventions you get for free:</strong></p>
+<ul>
+<li>A property named <code>ProductId</code> in <code>Product</code> becomes the primary key, with an identity column.</li>
+<li>A pair like <code>CategoryId</code> + <code>Category</code> becomes a foreign key.</li>
+<li><code>List&lt;Product&gt;</code> on <code>Category</code> creates the one-to-many relationship.</li>
+</ul>
+<h2 id="15-the-dbcontext">1.5 The DbContext</h2>
+<p><strong>Data/AppDbContext.cs</strong></p>
+<pre><code class="language-csharp">using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using ProductApi.Entities;
+
+namespace ProductApi.Data;
+
+// IdentityDbContext adds the AspNetUsers, AspNetRoles, ... tables to the same database
+public class AppDbContext(DbContextOptions&lt;AppDbContext&gt; options) : IdentityDbContext&lt;AppUser&gt;(options)
+{
+    public DbSet&lt;Category&gt; Categories =&gt; Set&lt;Category&gt;();
+    public DbSet&lt;Product&gt; Products =&gt; Set&lt;Product&gt;();
+    public DbSet&lt;Brand&gt; Brands =&gt; Set&lt;Brand&gt;();
+    public DbSet&lt;RefreshToken&gt; RefreshTokens =&gt; Set&lt;RefreshToken&gt;();
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);   // required for Identity
+
+        builder.Entity&lt;Category&gt;(e =&gt;
+        {
+            e.Property(c =&gt; c.CategoryName).HasMaxLength(100).IsRequired();
+            e.HasIndex(c =&gt; c.CategoryName).IsUnique();
+            e.HasData(                                   // seed data, inserted by the migration
+                new Category { CategoryId = 1, CategoryName = &quot;Electronics&quot; },
+                new Category { CategoryId = 2, CategoryName = &quot;Clothing&quot; },
+                new Category { CategoryId = 3, CategoryName = &quot;Food&quot; });
+        });
+
+        builder.Entity&lt;Product&gt;(e =&gt;
+        {
+            e.Property(p =&gt; p.ProductName).HasMaxLength(100).IsRequired();
+            e.Property(p =&gt; p.ManufacturingDate).HasColumnType(&quot;datetime&quot;);
+            e.Property(p =&gt; p.SerialNo).HasMaxLength(50).IsRequired();
+            e.Property(p =&gt; p.ImageUrl).HasMaxLength(200).IsRequired();
+            e.Property(p =&gt; p.Price).HasPrecision(18, 2);
+            e.HasIndex(p =&gt; p.SerialNo).IsUnique();      // no two products with the same serial
+            e.HasOne(p =&gt; p.Category)
+             .WithMany(c =&gt; c.Products)
+             .HasForeignKey(p =&gt; p.CategoryId)
+             .OnDelete(DeleteBehavior.Restrict);         // can't delete a category that has products
+        });
+
+        builder.Entity&lt;Brand&gt;(e =&gt;
+        {
+            e.Property(b =&gt; b.BrandName).HasMaxLength(100).IsRequired();
+            e.HasOne(b =&gt; b.Product)
+             .WithMany(p =&gt; p.Brands)
+             .HasForeignKey(b =&gt; b.ProductId)
+             .OnDelete(DeleteBehavior.Cascade);          // ON DELETE CASCADE, as in your schema
+        });
+
+        builder.Entity&lt;RefreshToken&gt;(e =&gt;
+        {
+            e.Property(t =&gt; t.TokenHash).HasMaxLength(128).IsRequired();
+            e.HasIndex(t =&gt; t.TokenHash).IsUnique();
+            e.HasOne(t =&gt; t.User)
+             .WithMany(u =&gt; u.RefreshTokens)
+             .HasForeignKey(t =&gt; t.UserId)
+             .OnDelete(DeleteBehavior.Cascade);
+        });
+    }
+}
+</code></pre>
+<p>This Fluent API configuration produces exactly your SQL schema: the lengths, <code>DECIMAL(18,2)</code>, <code>DATETIME</code>, the foreign keys and the cascade. In bigger projects, each entity's configuration usually moves into its own <code>IEntityTypeConfiguration&lt;T&gt;</code> class.</p>
+<h2 id="16-common-building-blocks">1.6 Common building blocks</h2>
+<p><strong>Common/Roles.cs</strong></p>
+<pre><code class="language-csharp">namespace ProductApi.Common;
+
+public static class Roles
+{
+    public const string Admin = &quot;Admin&quot;;
+    public const string User = &quot;User&quot;;
+}
+</code></pre>
+<p><strong>Common/JwtOptions.cs</strong></p>
+<pre><code class="language-csharp">using System.ComponentModel.DataAnnotations;
+
+namespace ProductApi.Common;
+
+public class JwtOptions
+{
+    public const string SectionName = &quot;Jwt&quot;;
+
+    [Required] public string Issuer { get; set; } = string.Empty;
+    [Required] public string Audience { get; set; } = string.Empty;
+    [Required, MinLength(32)] public string Key { get; set; } = string.Empty;
+    [Range(1, 1440)] public int AccessTokenMinutes { get; set; } = 15;
+    [Range(1, 90)] public int RefreshTokenDays { get; set; } = 7;
+}
+</code></pre>
+<p><strong>Common/Exceptions.cs</strong></p>
+<pre><code class="language-csharp">namespace ProductApi.Common;
+
+// Services throw these; GlobalExceptionHandler turns them into the right HTTP status
+public class BadRequestException(string message) : Exception(message);
+public class UnauthorizedException(string message) : Exception(message);
+public class ConflictException(string message) : Exception(message);
+</code></pre>
+<p><strong>Common/PagedResult.cs</strong></p>
+<pre><code class="language-csharp">namespace ProductApi.Common;
+
+public record PagedResult&lt;T&gt;(IReadOnlyList&lt;T&gt; Items, int Page, int PageSize, int TotalCount)
+{
+    public int TotalPages =&gt; (int)Math.Ceiling(TotalCount / (double)PageSize);
+    public bool HasPrevious =&gt; Page &gt; 1;
+    public bool HasNext =&gt; Page &lt; TotalPages;
+}
+</code></pre>
+<h2 id="17-dtos-the-apis-contract-with-both-clients">1.7 DTOs (the API's contract with both clients)</h2>
+<p><strong>Dtos/AuthDtos.cs</strong></p>
+<pre><code class="language-csharp">using System.ComponentModel.DataAnnotations;
+
+namespace ProductApi.Dtos;
+
+public class RegisterRequest
+{
+    [Required, StringLength(100)] public string FullName { get; set; } = string.Empty;
+    [Required, EmailAddress] public string Email { get; set; } = string.Empty;
+    [Required, StringLength(100, MinimumLength = 8)] public string Password { get; set; } = string.Empty;
+    [Required, Compare(nameof(Password), ErrorMessage = &quot;Passwords do not match.&quot;)]
+    public string ConfirmPassword { get; set; } = string.Empty;
+}
+
+public class LoginRequest
+{
+    [Required, EmailAddress] public string Email { get; set; } = string.Empty;
+    [Required] public string Password { get; set; } = string.Empty;
+}
+
+public class RefreshRequest
+{
+    [Required] public string RefreshToken { get; set; } = string.Empty;
+}
+
+public record UserDto(string Id, string Email, string FullName, IReadOnlyList&lt;string&gt; Roles);
+
+public record AuthResponse(string AccessToken, DateTime AccessTokenExpiresAt,
+                           string RefreshToken, DateTime RefreshTokenExpiresAt, UserDto User);
+</code></pre>
+<p><strong>Dtos/ProductDtos.cs</strong></p>
+<pre><code class="language-csharp">using System.ComponentModel.DataAnnotations;
+
+namespace ProductApi.Dtos;
+
+// ---------- Requests (what clients send) ----------
+public class BrandRequest
+{
+    [Required, StringLength(100)] public string BrandName { get; set; } = string.Empty;
+    [Range(0, 100000)] public int Stock { get; set; }
+}
+
+public class ProductRequest : IValidatableObject
+{
+    [Required, StringLength(100)] public string ProductName { get; set; } = string.Empty;
+    [Required] public DateOnly? ManufacturingDate { get; set; }
+    [Required, StringLength(50)] public string SerialNo { get; set; } = string.Empty;
+    [StringLength(200)] public string? ImageFileName { get; set; }   // from the upload endpoint; null = no image
+    public bool IsAvailable { get; set; }
+    [Range(1, int.MaxValue, ErrorMessage = &quot;Please select a category.&quot;)] public int CategoryId { get; set; }
+    [Range(0.01, 1000000, ErrorMessage = &quot;Price must be between 0.01 and 1,000,000.&quot;)] public decimal Price { get; set; }
+    public List&lt;BrandRequest&gt; Brands { get; set; } = [];
+
+    // Rules involving more than one field
+    public IEnumerable&lt;ValidationResult&gt; Validate(ValidationContext validationContext)
+    {
+        if (ManufacturingDate &gt; DateOnly.FromDateTime(DateTime.Today))
+            yield return new ValidationResult(&quot;Manufacturing date cannot be in the future.&quot;, [nameof(ManufacturingDate)]);
+
+        var hasDuplicates = Brands.GroupBy(b =&gt; b.BrandName.Trim().ToLowerInvariant()).Any(g =&gt; g.Count() &gt; 1);
+        if (hasDuplicates)
+            yield return new ValidationResult(&quot;Brand names must be unique.&quot;, [nameof(Brands)]);
+    }
+}
+
+public class ProductQuery
+{
+    [StringLength(100)] public string? Search { get; set; }
+    public int? CategoryId { get; set; }
+    public string? SortBy { get; set; }    // name | price | date
+    public string? SortDir { get; set; }   // asc | desc
+    [Range(1, int.MaxValue)] public int Page { get; set; } = 1;
+    [Range(1, 50)] public int PageSize { get; set; } = 10;
+}
+
+// ---------- Responses (what the API sends) ----------
+public record BrandResponse(int BrandId, string BrandName, int Stock);
+
+public record ProductResponse(
+    int ProductId,
+    string ProductName,
+    DateOnly ManufacturingDate,   // serialized as &quot;2025-06-15&quot;, perfect for &lt;input type=&quot;date&quot;&gt;
+    string SerialNo,
+    string ImageFileName,         // send this back in ProductRequest when editing
+    string ImageUrl,              // full URL, ready for &lt;img src&gt;
+    bool IsAvailable,
+    int CategoryId,
+    string CategoryName,
+    decimal Price,
+    IReadOnlyList&lt;BrandResponse&gt; Brands)
+{
+    public int TotalStock =&gt; Brands.Sum(b =&gt; b.Stock);
+}
+
+public record CategoryResponse(int CategoryId, string CategoryName);
+
+public record UploadResponse(string FileName, string Url);
+</code></pre>
+<p><strong>Why <code>ImageFileName</code> and <code>ImageUrl</code> are separate:</strong> the database column <code>ImageUrl</code> stores just the file name. Clients need a <strong>full URL</strong> to display the image, and the <strong>file name</strong> to send back when saving. Two fields make both jobs obvious.</p>
+<h2 id="18-services-business-logic">1.8 Services (business logic)</h2>
+<h3 id="servicesimageservicecs">Services/ImageService.cs</h3>
+<pre><code class="language-csharp">using ProductApi.Common;
+using ProductApi.Dtos;
+
+namespace ProductApi.Services;
+
+public interface IImageService
+{
+    Task&lt;UploadResponse&gt; SaveAsync(IFormFile file, CancellationToken ct);
+    void Delete(string? fileName);
+    string GetUrl(string? fileName);
+}
+
+public class ImageService(IWebHostEnvironment env, IHttpContextAccessor httpContextAccessor) : IImageService
+{
+    public const string DefaultImage = &quot;noimage.png&quot;;
+    private const long MaxBytes = 2 * 1024 * 1024; // 2 MB
+    private static readonly string[] AllowedExtensions = [&quot;.jpg&quot;, &quot;.jpeg&quot;, &quot;.png&quot;, &quot;.webp&quot;];
+
+    private string ImageFolder =&gt; Path.Combine(env.WebRootPath, &quot;images&quot;);
+
+    public async Task&lt;UploadResponse&gt; SaveAsync(IFormFile file, CancellationToken ct)
+    {
+        if (file.Length == 0) throw new BadRequestException(&quot;The file is empty.&quot;);
+        if (file.Length &gt; MaxBytes) throw new BadRequestException(&quot;Maximum image size is 2 MB.&quot;);
+
+        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+        if (!AllowedExtensions.Contains(extension) || !file.ContentType.StartsWith(&quot;image/&quot;))
+            throw new BadRequestException(&quot;Only .jpg, .jpeg, .png and .webp images are allowed.&quot;);
+
+        Directory.CreateDirectory(ImageFolder);
+        // Never use the client's file name: a random name prevents overwrites and path tricks like &quot;../../web.config&quot;
+        var fileName = $&quot;{Guid.NewGuid()}{extension}&quot;;
+        await using var stream = new FileStream(Path.Combine(ImageFolder, fileName), FileMode.Create);
+        await file.CopyToAsync(stream, ct);
+
+        return new UploadResponse(fileName, GetUrl(fileName));
+    }
+
+    public void Delete(string? fileName)
+    {
+        if (string.IsNullOrWhiteSpace(fileName) || fileName == DefaultImage) return;
+        var path = Path.Combine(ImageFolder, Path.GetFileName(fileName));
+        if (File.Exists(path)) File.Delete(path);
+    }
+
+    public string GetUrl(string? fileName)
+    {
+        var name = string.IsNullOrWhiteSpace(fileName) ? DefaultImage : fileName;
+        var request = httpContextAccessor.HttpContext?.Request;
+        return request is null ? $&quot;/images/{name}&quot; : $&quot;{request.Scheme}://{request.Host}/images/{name}&quot;;
+    }
+}
+</code></pre>
+<h3 id="servicestokenservicecs">Services/TokenService.cs</h3>
+<pre><code class="language-csharp">using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
+using ProductApi.Common;
+using ProductApi.Entities;
+
+namespace ProductApi.Services;
+
+public record AccessToken(string Token, DateTime ExpiresAt);
+
+public interface ITokenService
+{
+    AccessToken CreateAccessToken(AppUser user, IEnumerable&lt;string&gt; roles);
+    (string RawToken, string TokenHash) CreateRefreshToken();
+    string HashToken(string rawToken);
+}
+
+public class TokenService(IOptions&lt;JwtOptions&gt; options) : ITokenService
+{
+    private readonly JwtOptions _jwt = options.Value;
+
+    public AccessToken CreateAccessToken(AppUser user, IEnumerable&lt;string&gt; roles)
+    {
+        // Claims = facts about the user, readable by anyone who has the token (never put secrets here)
+        var claims = new List&lt;Claim&gt;
+        {
+            new(JwtRegisteredClaimNames.Sub, user.Id),
+            new(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
+            new(&quot;name&quot;, user.FullName),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        };
+        claims.AddRange(roles.Select(role =&gt; new Claim(&quot;role&quot;, role)));
+
+        var expiresAt = DateTime.UtcNow.AddMinutes(_jwt.AccessTokenMinutes);
+        var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));
+
+        var token = new JsonWebTokenHandler().CreateToken(new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(claims),
+            Expires = expiresAt,
+            Issuer = _jwt.Issuer,
+            Audience = _jwt.Audience,
+            SigningCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
+        });
+
+        return new AccessToken(token, expiresAt);
+    }
+
+    public (string RawToken, string TokenHash) CreateRefreshToken()
+    {
+        var raw = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+        return (raw, HashToken(raw));
+    }
+
+    public string HashToken(string rawToken) =&gt;
+        Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(rawToken)));
+}
+</code></pre>
+<p><strong>What a JWT is.</strong> A JWT is three Base64 parts: <code>header.payload.signature</code>. The payload (the claims) is <strong>readable by anyone</strong>; paste a token into jwt.io to see. The <strong>signature</strong> proves the API created it and that nobody changed it. That's why the signing key must stay secret.</p>
+<h3 id="servicesauthservicecs">Services/AuthService.cs</h3>
+<pre><code class="language-csharp">using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using ProductApi.Common;
+using ProductApi.Data;
+using ProductApi.Dtos;
+using ProductApi.Entities;
+
+namespace ProductApi.Services;
+
+public interface IAuthService
+{
+    Task&lt;AuthResponse&gt; RegisterAsync(RegisterRequest request, CancellationToken ct);
+    Task&lt;AuthResponse&gt; LoginAsync(LoginRequest request, CancellationToken ct);
+    Task&lt;AuthResponse&gt; RefreshAsync(string refreshToken, CancellationToken ct);
+    Task LogoutAsync(string userId, string refreshToken, CancellationToken ct);
+    Task&lt;UserDto?&gt; GetUserAsync(string userId);
+}
+
+public class AuthService(
+    UserManager&lt;AppUser&gt; userManager,
+    SignInManager&lt;AppUser&gt; signInManager,
+    AppDbContext db,
+    ITokenService tokenService,
+    IOptions&lt;JwtOptions&gt; jwtOptions,
+    ILogger&lt;AuthService&gt; logger) : IAuthService
+{
+    private readonly JwtOptions _jwt = jwtOptions.Value;
+
+    public async Task&lt;AuthResponse&gt; RegisterAsync(RegisterRequest request, CancellationToken ct)
+    {
+        if (await userManager.FindByEmailAsync(request.Email) is not null)
+            throw new ConflictException(&quot;An account with this email already exists.&quot;);
+
+        var user = new AppUser { UserName = request.Email, Email = request.Email, FullName = request.FullName.Trim() };
+
+        var result = await userManager.CreateAsync(user, request.Password);   // hashes the password
+        if (!result.Succeeded)
+            throw new BadRequestException(string.Join(&quot; &quot;, result.Errors.Select(e =&gt; e.Description)));
+
+        await userManager.AddToRoleAsync(user, Roles.User);
+        logger.LogInformation(&quot;User registered: {Email}&quot;, user.Email);
+        return await IssueTokensAsync(user, ct);
+    }
+
+    public async Task&lt;AuthResponse&gt; LoginAsync(LoginRequest request, CancellationToken ct)
+    {
+        var user = await userManager.FindByEmailAsync(request.Email);
+        // Same message for &quot;unknown email&quot; and &quot;wrong password&quot;: attackers can't discover which emails exist
+        if (user is null) throw new UnauthorizedException(&quot;Invalid email or password.&quot;);
+
+        var result = await signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: true);
+        if (result.IsLockedOut) throw new UnauthorizedException(&quot;Account locked after too many attempts. Try again in 15 minutes.&quot;);
+        if (!result.Succeeded) throw new UnauthorizedException(&quot;Invalid email or password.&quot;);
+
+        return await IssueTokensAsync(user, ct);
+    }
+
+    public async Task&lt;AuthResponse&gt; RefreshAsync(string refreshToken, CancellationToken ct)
+    {
+        var hash = tokenService.HashToken(refreshToken);
+        var stored = await db.RefreshTokens.Include(t =&gt; t.User).FirstOrDefaultAsync(t =&gt; t.TokenHash == hash, ct);
+
+        if (stored is null) throw new UnauthorizedException(&quot;Invalid refresh token.&quot;);
+
+        if (stored.RevokedAt is not null)
+        {
+            // A revoked token used again = probably stolen → end every session of this user
+            logger.LogWarning(&quot;Refresh token reuse detected for user {UserId}&quot;, stored.UserId);
+            await db.RefreshTokens
+                .Where(t =&gt; t.UserId == stored.UserId &amp;&amp; t.RevokedAt == null)
+                .ExecuteUpdateAsync(s =&gt; s.SetProperty(t =&gt; t.RevokedAt, DateTime.UtcNow), ct);
+            throw new UnauthorizedException(&quot;Session expired. Please log in again.&quot;);
+        }
+
+        if (stored.ExpiresAt &lt;= DateTime.UtcNow) throw new UnauthorizedException(&quot;Session expired. Please log in again.&quot;);
+
+        stored.RevokedAt = DateTime.UtcNow;   // ROTATION: each refresh token works exactly once
+        return await IssueTokensAsync(stored.User, ct);
+    }
+
+    public async Task LogoutAsync(string userId, string refreshToken, CancellationToken ct)
+    {
+        var hash = tokenService.HashToken(refreshToken);
+        var stored = await db.RefreshTokens.FirstOrDefaultAsync(t =&gt; t.TokenHash == hash &amp;&amp; t.UserId == userId, ct);
+        if (stored is { RevokedAt: null })
+        {
+            stored.RevokedAt = DateTime.UtcNow;
+            await db.SaveChangesAsync(ct);
+        }
+    }
+
+    public async Task&lt;UserDto?&gt; GetUserAsync(string userId)
+    {
+        var user = await userManager.FindByIdAsync(userId);
+        if (user is null) return null;
+        var roles = await userManager.GetRolesAsync(user);
+        return new UserDto(user.Id, user.Email ?? string.Empty, user.FullName, roles.ToList());
+    }
+
+    private async Task&lt;AuthResponse&gt; IssueTokensAsync(AppUser user, CancellationToken ct)
+    {
+        var roles = await userManager.GetRolesAsync(user);
+        var accessToken = tokenService.CreateAccessToken(user, roles);
+        var (rawRefresh, refreshHash) = tokenService.CreateRefreshToken();
+        var refreshExpiresAt = DateTime.UtcNow.AddDays(_jwt.RefreshTokenDays);
+
+        db.RefreshTokens.Add(new RefreshToken
+        {
+            UserId = user.Id,
+            TokenHash = refreshHash,
+            CreatedAt = DateTime.UtcNow,
+            ExpiresAt = refreshExpiresAt
+        });
+        await db.SaveChangesAsync(ct);   // also saves the revocation from RefreshAsync (same transaction)
+
+        return new AuthResponse(accessToken.Token, accessToken.ExpiresAt, rawRefresh, refreshExpiresAt,
+            new UserDto(user.Id, user.Email ?? string.Empty, user.FullName, roles.ToList()));
+    }
+}
+</code></pre>
+<p><strong>Why two tokens?</strong></p>
+<ul>
+<li><strong>Access token:</strong> short-lived (15 min), never stored by the API, checked on every request. It can't be cancelled, so it must expire quickly.</li>
+<li><strong>Refresh token:</strong> long-lived (7 days), stored in the database as a hash, and used only to get a new pair. It <em>can</em> be cancelled (logout, theft detected).</li>
+</ul>
+<p>Together they give users long sessions with fast, stateless request checks.</p>
+<h3 id="servicescategoryservicecs">Services/CategoryService.cs</h3>
+<pre><code class="language-csharp">using Microsoft.EntityFrameworkCore;
+using ProductApi.Data;
+using ProductApi.Dtos;
+
+namespace ProductApi.Services;
+
+public interface ICategoryService
+{
+    Task&lt;IReadOnlyList&lt;CategoryResponse&gt;&gt; GetAllAsync(CancellationToken ct);
+}
+
+public class CategoryService(AppDbContext db) : ICategoryService
+{
+    public async Task&lt;IReadOnlyList&lt;CategoryResponse&gt;&gt; GetAllAsync(CancellationToken ct) =&gt;
+        await db.Categories.AsNoTracking()
+            .OrderBy(c =&gt; c.CategoryName)
+            .Select(c =&gt; new CategoryResponse(c.CategoryId, c.CategoryName))   // projection: SQL selects only 2 columns
+            .ToListAsync(ct);
+}
+</code></pre>
+<h3 id="servicesproductservicecs">Services/ProductService.cs</h3>
+<pre><code class="language-csharp">using Microsoft.EntityFrameworkCore;
+using ProductApi.Common;
+using ProductApi.Data;
+using ProductApi.Dtos;
+using ProductApi.Entities;
+
+namespace ProductApi.Services;
+
+public interface IProductService
+{
+    Task&lt;PagedResult&lt;ProductResponse&gt;&gt; GetPagedAsync(ProductQuery query, CancellationToken ct);
+    Task&lt;ProductResponse?&gt; GetByIdAsync(int id, CancellationToken ct);
+    Task&lt;ProductResponse&gt; CreateAsync(ProductRequest request, CancellationToken ct);
+    Task&lt;ProductResponse?&gt; UpdateAsync(int id, ProductRequest request, CancellationToken ct);
+    Task&lt;bool&gt; DeleteAsync(int id, CancellationToken ct);
+}
+
+public class ProductService(AppDbContext db, IImageService images) : IProductService
+{
+    public async Task&lt;PagedResult&lt;ProductResponse&gt;&gt; GetPagedAsync(ProductQuery q, CancellationToken ct)
+    {
+        // IQueryable = a query being built; nothing runs in SQL until ToListAsync/CountAsync
+        IQueryable&lt;Product&gt; query = db.Products.AsNoTracking()
+            .Include(p =&gt; p.Category)
+            .Include(p =&gt; p.Brands);
+
+        if (!string.IsNullOrWhiteSpace(q.Search))
+        {
+            var search = q.Search.Trim();
+            query = query.Where(p =&gt; p.ProductName.Contains(search) || p.SerialNo.Contains(search));
+        }
+        if (q.CategoryId.HasValue)
+            query = query.Where(p =&gt; p.CategoryId == q.CategoryId.Value);
+
+        var desc = string.Equals(q.SortDir, &quot;desc&quot;, StringComparison.OrdinalIgnoreCase);
+        query = q.SortBy?.ToLowerInvariant() switch
+        {
+            &quot;price&quot; =&gt; desc ? query.OrderByDescending(p =&gt; p.Price) : query.OrderBy(p =&gt; p.Price),
+            &quot;date&quot; =&gt; desc ? query.OrderByDescending(p =&gt; p.ManufacturingDate) : query.OrderBy(p =&gt; p.ManufacturingDate),
+            &quot;name&quot; =&gt; desc ? query.OrderByDescending(p =&gt; p.ProductName) : query.OrderBy(p =&gt; p.ProductName),
+            _ =&gt; query.OrderByDescending(p =&gt; p.ProductId)   // newest first by default
+        };
+
+        var total = await query.CountAsync(ct);
+        var items = await query
+            .Skip((q.Page - 1) * q.PageSize)   // e.g. page 3, size 10 → skip 20
+            .Take(q.PageSize)
+            .AsSplitQuery()
+            .ToListAsync(ct);
+
+        return new PagedResult&lt;ProductResponse&gt;(items.Select(ToResponse).ToList(), q.Page, q.PageSize, total);
+    }
+
+    public async Task&lt;ProductResponse?&gt; GetByIdAsync(int id, CancellationToken ct)
+    {
+        var product = await db.Products.AsNoTracking()
+            .Include(p =&gt; p.Category)
+            .Include(p =&gt; p.Brands)
+            .FirstOrDefaultAsync(p =&gt; p.ProductId == id, ct);
+        return product is null ? null : ToResponse(product);
+    }
+
+    public async Task&lt;ProductResponse&gt; CreateAsync(ProductRequest r, CancellationToken ct)
+    {
+        await EnsureCategoryExistsAsync(r.CategoryId, ct);
+
+        var product = new Product
+        {
+            ProductName = r.ProductName.Trim(),
+            ManufacturingDate = r.ManufacturingDate!.Value.ToDateTime(TimeOnly.MinValue),
+            SerialNo = r.SerialNo.Trim(),
+            ImageUrl = string.IsNullOrWhiteSpace(r.ImageFileName) ? ImageService.DefaultImage : r.ImageFileName,
+            IsAvailable = r.IsAvailable,
+            CategoryId = r.CategoryId,
+            Price = r.Price,
+            Brands = r.Brands.Select(b =&gt; new Brand { BrandName = b.BrandName.Trim(), Stock = b.Stock }).ToList()
+        };
+
+        db.Products.Add(product);
+        await db.SaveChangesAsync(ct);   // EF inserts the product AND its brands in one transaction
+        return (await GetByIdAsync(product.ProductId, ct))!;
+    }
+
+    public async Task&lt;ProductResponse?&gt; UpdateAsync(int id, ProductRequest r, CancellationToken ct)
+    {
+        var product = await db.Products.Include(p =&gt; p.Brands).FirstOrDefaultAsync(p =&gt; p.ProductId == id, ct);
+        if (product is null) return null;
+
+        await EnsureCategoryExistsAsync(r.CategoryId, ct);
+
+        var oldImage = product.ImageUrl;
+        var newImage = string.IsNullOrWhiteSpace(r.ImageFileName) ? oldImage : r.ImageFileName;
+
+        product.ProductName = r.ProductName.Trim();
+        product.ManufacturingDate = r.ManufacturingDate!.Value.ToDateTime(TimeOnly.MinValue);
+        product.SerialNo = r.SerialNo.Trim();
+        product.ImageUrl = newImage;
+        product.IsAvailable = r.IsAvailable;
+        product.CategoryId = r.CategoryId;
+        product.Price = r.Price;
+
+        // Replace brands: removing them from the collection deletes them (required relationship = orphan delete)
+        product.Brands.Clear();
+        foreach (var b in r.Brands)
+            product.Brands.Add(new Brand { BrandName = b.BrandName.Trim(), Stock = b.Stock });
+
+        await db.SaveChangesAsync(ct);
+        if (newImage != oldImage) images.Delete(oldImage);   // clean up the replaced file
+        return await GetByIdAsync(id, ct);
+    }
+
+    public async Task&lt;bool&gt; DeleteAsync(int id, CancellationToken ct)
+    {
+        var product = await db.Products.FindAsync([id], ct);
+        if (product is null) return false;
+
+        db.Products.Remove(product);      // Brands deleted by ON DELETE CASCADE
+        await db.SaveChangesAsync(ct);
+        images.Delete(product.ImageUrl);
+        return true;
+    }
+
+    private async Task EnsureCategoryExistsAsync(int categoryId, CancellationToken ct)
+    {
+        if (!await db.Categories.AnyAsync(c =&gt; c.CategoryId == categoryId, ct))
+            throw new BadRequestException($&quot;Category {categoryId} does not exist.&quot;);
+    }
+
+    private ProductResponse ToResponse(Product p) =&gt; new(
+        p.ProductId,
+        p.ProductName,
+        DateOnly.FromDateTime(p.ManufacturingDate),
+        p.SerialNo,
+        p.ImageUrl,
+        images.GetUrl(p.ImageUrl),
+        p.IsAvailable,
+        p.CategoryId,
+        p.Category?.CategoryName ?? string.Empty,
+        p.Price,
+        p.Brands.Select(b =&gt; new BrandResponse(b.BrandId, b.BrandName, b.Stock)).ToList());
+}
+</code></pre>
+<p><strong>EF Core habits shown here:</strong></p>
+<ul>
+<li><strong><code>AsNoTracking</code></strong> for read-only queries: faster, because EF doesn't watch the entities for changes.</li>
+<li><strong>Filter and page in SQL</strong> (<code>Where</code>, <code>Skip</code>, <code>Take</code> <em>before</em> <code>ToListAsync</code>), never in memory.</li>
+<li><strong>Load with <code>Include</code>, then change, then <code>SaveChangesAsync</code>.</strong> EF works out the needed INSERT, UPDATE and DELETE statements itself.</li>
+</ul>
+<h2 id="19-infrastructure">1.9 Infrastructure</h2>
+<h3 id="infrastructureglobalexceptionhandlercs">Infrastructure/GlobalExceptionHandler.cs</h3>
+<pre><code class="language-csharp">using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using ProductApi.Common;
+
+namespace ProductApi.Infrastructure;
+
+public class GlobalExceptionHandler(
+    ILogger&lt;GlobalExceptionHandler&gt; logger,
+    IProblemDetailsService problemDetailsService,
+    IHostEnvironment env) : IExceptionHandler
+{
+    public async ValueTask&lt;bool&gt; TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken ct)
+    {
+        var (status, title, detail) = exception switch
+        {
+            BadRequestException e =&gt; (400, &quot;Bad request&quot;, e.Message),
+            UnauthorizedException e =&gt; (401, &quot;Unauthorized&quot;, e.Message),
+            ConflictException e =&gt; (409, &quot;Conflict&quot;, e.Message),
+            DbUpdateException { InnerException: SqlException { Number: 2601 or 2627 } } =&gt;
+                (409, &quot;Conflict&quot;, &quot;A record with the same unique value already exists (e.g. serial number).&quot;),
+            DbUpdateException { InnerException: SqlException { Number: 547 } } =&gt;
+                (409, &quot;Conflict&quot;, &quot;This record is linked to other data.&quot;),
+            _ =&gt; (500, &quot;Server error&quot;, env.IsDevelopment() ? exception.Message : &quot;An unexpected error occurred.&quot;)
+        };
+
+        if (status == 500) logger.LogError(exception, &quot;Unhandled exception&quot;);
+        else logger.LogWarning(&quot;{Status} {Title}: {Detail}&quot;, status, title, detail);
+
+        httpContext.Response.StatusCode = status;
+        return await problemDetailsService.TryWriteAsync(new ProblemDetailsContext
+        {
+            HttpContext = httpContext,
+            Exception = exception,
+            ProblemDetails = new ProblemDetails { Status = status, Title = title, Detail = detail }
+        });
+    }
+}
+</code></pre>
+<p>Every error now reaches the clients in one standard shape (ProblemDetails, RFC 9457):</p>
+<pre><code class="language-json">{ &quot;title&quot;: &quot;Conflict&quot;, &quot;status&quot;: 409, &quot;detail&quot;: &quot;A record with the same unique value already exists...&quot;, &quot;traceId&quot;: &quot;...&quot; }
+</code></pre>
+<p>Validation errors (the automatic 400 from <code>[ApiController]</code>) also include <code>"errors": { "ProductName": ["The ProductName field is required."] }</code>.</p>
+<h3 id="infrastructurebearersecurityschemetransformercs-adds-the-bearer-token-box-to-scalar">Infrastructure/BearerSecuritySchemeTransformer.cs (adds the "Bearer token" box to Scalar)</h3>
+<p><strong>.NET 10 version:</strong></p>
+<pre><code class="language-csharp">using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.OpenApi;
+using Microsoft.OpenApi;
+
+namespace ProductApi.Infrastructure;
+
+internal sealed class BearerSecuritySchemeTransformer(IAuthenticationSchemeProvider schemeProvider)
+    : IOpenApiDocumentTransformer
+{
+    public async Task TransformAsync(OpenApiDocument document, OpenApiDocumentTransformerContext context, CancellationToken ct)
+    {
+        var schemes = await schemeProvider.GetAllSchemesAsync();
+        if (!schemes.Any(s =&gt; s.Name == &quot;Bearer&quot;)) return;
+
+        document.Components ??= new OpenApiComponents();
+        document.Components.SecuritySchemes = new Dictionary&lt;string, IOpenApiSecurityScheme&gt;
+        {
+            [&quot;Bearer&quot;] = new OpenApiSecurityScheme
+            {
+                Type = SecuritySchemeType.Http,
+                Scheme = &quot;bearer&quot;,
+                In = ParameterLocation.Header,
+                BearerFormat = &quot;JWT&quot;
+            }
+        };
+
+        foreach (var operation in document.Paths.Values.SelectMany(p =&gt; p.Operations ?? []))
+        {
+            operation.Value.Security ??= [];
+            operation.Value.Security.Add(new OpenApiSecurityRequirement
+            {
+                [new OpenApiSecuritySchemeReference(&quot;Bearer&quot;, document)] = []
+            });
+        }
+    }
+}
+</code></pre>
+<p><strong>.NET 9 version</strong> (OpenAPI library v1): replace the file body with:</p>
+<pre><code class="language-csharp">using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.OpenApi;
+using Microsoft.OpenApi.Models;
+
+namespace ProductApi.Infrastructure;
+
+internal sealed class BearerSecuritySchemeTransformer(IAuthenticationSchemeProvider schemeProvider)
+    : IOpenApiDocumentTransformer
+{
+    public async Task TransformAsync(OpenApiDocument document, OpenApiDocumentTransformerContext context, CancellationToken ct)
+    {
+        var schemes = await schemeProvider.GetAllSchemesAsync();
+        if (!schemes.Any(s =&gt; s.Name == &quot;Bearer&quot;)) return;
+
+        document.Components ??= new OpenApiComponents();
+        document.Components.SecuritySchemes[&quot;Bearer&quot;] = new OpenApiSecurityScheme
+        {
+            Type = SecuritySchemeType.Http, Scheme = &quot;bearer&quot;, In = ParameterLocation.Header, BearerFormat = &quot;JWT&quot;
+        };
+
+        var requirement = new OpenApiSecurityRequirement
+        {
+            [new OpenApiSecurityScheme { Reference = new OpenApiReference { Id = &quot;Bearer&quot;, Type = ReferenceType.SecurityScheme } }] = Array.Empty&lt;string&gt;()
+        };
+        foreach (var operation in document.Paths.Values.SelectMany(p =&gt; p.Operations.Values))
+            operation.Security.Add(requirement);
+    }
+}
+</code></pre>
+<p>If this file ever fails to compile after a package update, delete it and the <code>AddDocumentTransformer</code> call. Scalar still works for public endpoints, and you can test protected ones with the <code>.http</code> file (section 1.13).</p>
+<h3 id="datadbseedercs-creates-roles-the-first-admin">Data/DbSeeder.cs (creates roles + the first admin)</h3>
+<pre><code class="language-csharp">using Microsoft.AspNetCore.Identity;
+using ProductApi.Common;
+using ProductApi.Entities;
+
+namespace ProductApi.Data;
+
+public static class DbSeeder
+{
+    public static async Task SeedAsync(IServiceProvider services, IConfiguration config)
+    {
+        var roleManager = services.GetRequiredService&lt;RoleManager&lt;IdentityRole&gt;&gt;();
+        var userManager = services.GetRequiredService&lt;UserManager&lt;AppUser&gt;&gt;();
+
+        foreach (var role in new[] { Roles.Admin, Roles.User })
+            if (!await roleManager.RoleExistsAsync(role))
+                await roleManager.CreateAsync(new IdentityRole(role));
+
+        var email = config[&quot;SeedAdmin:Email&quot;];
+        var password = config[&quot;SeedAdmin:Password&quot;];
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password)) return;
+        if (await userManager.FindByEmailAsync(email) is not null) return;
+
+        var admin = new AppUser
+        {
+            UserName = email,
+            Email = email,
+            FullName = config[&quot;SeedAdmin:FullName&quot;] ?? &quot;Admin&quot;,
+            EmailConfirmed = true
+        };
+        var result = await userManager.CreateAsync(admin, password);
+        if (result.Succeeded) await userManager.AddToRolesAsync(admin, [Roles.Admin, Roles.User]);
+    }
+}
+</code></pre>
+<h2 id="110-programcs-di-registrations-middleware-pipeline">1.10 Program.cs (DI registrations + middleware pipeline)</h2>
+<pre><code class="language-csharp">using System.Text;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using ProductApi.Common;
+using ProductApi.Data;
+using ProductApi.Entities;
+using ProductApi.Infrastructure;
+using ProductApi.Services;
+using Scalar.AspNetCore;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// ===== 1. Database =====
+builder.Services.AddDbContext&lt;AppDbContext&gt;(o =&gt;
+    o.UseSqlServer(builder.Configuration.GetConnectionString(&quot;DefaultConnection&quot;)));
+
+// ===== 2. Settings (fail fast at startup if the JWT key is missing) =====
+builder.Services.AddOptions&lt;JwtOptions&gt;()
+    .BindConfiguration(JwtOptions.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+// ===== 3. Identity (users, password hashing, lockout, roles) =====
+builder.Services.AddIdentityCore&lt;AppUser&gt;(o =&gt;
+    {
+        o.Password.RequiredLength = 8;
+        o.Password.RequireDigit = true;
+        o.Password.RequireUppercase = true;
+        o.Password.RequireLowercase = true;
+        o.Password.RequireNonAlphanumeric = true;
+        o.Lockout.MaxFailedAccessAttempts = 5;
+        o.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+        o.User.RequireUniqueEmail = true;
+    })
+    .AddRoles&lt;IdentityRole&gt;()
+    .AddEntityFrameworkStores&lt;AppDbContext&gt;()
+    .AddSignInManager();
+
+// ===== 4. JWT authentication =====
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(o =&gt;
+    {
+        var jwt = builder.Configuration.GetSection(JwtOptions.SectionName).Get&lt;JwtOptions&gt;()!;
+        o.MapInboundClaims = false;   // keep claim names short: &quot;sub&quot;, &quot;name&quot;, &quot;role&quot;
+        o.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwt.Issuer,
+            ValidateAudience = true,
+            ValidAudience = jwt.Audience,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key)),
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromSeconds(30),
+            NameClaimType = &quot;name&quot;,
+            RoleClaimType = &quot;role&quot;
+        };
+    });
+builder.Services.AddAuthorization();
+
+// ===== 5. CORS: only our two clients =====
+var origins = builder.Configuration.GetSection(&quot;Cors:AllowedOrigins&quot;).Get&lt;string[]&gt;() ?? [];
+builder.Services.AddCors(o =&gt; o.AddPolicy(&quot;Clients&quot;, p =&gt;
+    p.WithOrigins(origins).AllowAnyHeader().AllowAnyMethod().WithExposedHeaders(&quot;Location&quot;)));
+
+// ===== 6. Rate limiting =====
+builder.Services.AddRateLimiter(o =&gt;
+{
+    o.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    o.GlobalLimiter = PartitionedRateLimiter.Create&lt;HttpContext, string&gt;(ctx =&gt;
+        RateLimitPartition.GetFixedWindowLimiter(ctx.Connection.RemoteIpAddress?.ToString() ?? &quot;unknown&quot;,
+            _ =&gt; new FixedWindowRateLimiterOptions { PermitLimit = 200, Window = TimeSpan.FromMinutes(1) }));
+    o.AddPolicy(&quot;auth&quot;, ctx =&gt;
+        RateLimitPartition.GetFixedWindowLimiter(ctx.Connection.RemoteIpAddress?.ToString() ?? &quot;unknown&quot;,
+            _ =&gt; new FixedWindowRateLimiterOptions { PermitLimit = 10, Window = TimeSpan.FromMinutes(1) }));
+});
+
+// ===== 7. Errors as ProblemDetails =====
+builder.Services.AddProblemDetails(o =&gt; o.CustomizeProblemDetails = ctx =&gt;
+    ctx.ProblemDetails.Extensions[&quot;traceId&quot;] = ctx.HttpContext.TraceIdentifier);
+builder.Services.AddExceptionHandler&lt;GlobalExceptionHandler&gt;();
+
+// ===== 8. Controllers + OpenAPI =====
+builder.Services.AddControllers();
+builder.Services.AddOpenApi(o =&gt; o.AddDocumentTransformer&lt;BearerSecuritySchemeTransformer&gt;());
+
+// ===== 9. Our services =====
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped&lt;IImageService, ImageService&gt;();
+builder.Services.AddScoped&lt;ITokenService, TokenService&gt;();
+builder.Services.AddScoped&lt;IAuthService, AuthService&gt;();
+builder.Services.AddScoped&lt;ICategoryService, CategoryService&gt;();
+builder.Services.AddScoped&lt;IProductService, ProductService&gt;();
+
+// ===== 10. Health checks =====
+builder.Services.AddHealthChecks().AddDbContextCheck&lt;AppDbContext&gt;();
+
+var app = builder.Build();
+
+// ===== Seed roles + admin =====
+using (var scope = app.Services.CreateScope())
+{
+    await DbSeeder.SeedAsync(scope.ServiceProvider, app.Configuration);
+}
+
+// ===== Middleware pipeline (ORDER MATTERS) =====
+app.UseExceptionHandler();
+app.UseStatusCodePages();          // empty 401/403/404 bodies → ProblemDetails JSON
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();               // /openapi/v1.json
+    app.MapScalarApiReference();    // /scalar/v1  (interactive API docs)
+}
+else
+{
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();               // serves wwwroot/images
+app.UseRouting();
+app.UseCors(&quot;Clients&quot;);
+app.UseRateLimiter();
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+app.MapHealthChecks(&quot;/health&quot;);
+
+app.Run();
+</code></pre>
+<p><strong>Service lifetimes:</strong></p>
+<ul>
+<li><strong>Scoped</strong> (one instance per HTTP request) is right for anything that uses the <code>DbContext</code>.</li>
+<li><strong>Singleton</strong> is one instance for the whole app.</li>
+<li><strong>Transient</strong> creates a new instance every time it's requested.</li>
+</ul>
+<h2 id="111-migrations-create-the-database-from-code">1.11 Migrations: create the database from code</h2>
+<p>Package Manager Console (build first with Ctrl+Shift+B):</p>
+<pre><code class="language-powershell">Add-Migration InitialCreate
+Update-Database
+</code></pre>
+<p>Open <code>Migrations/xxxx_InitialCreate.cs</code> and read it. That's the SQL your classes produced: <code>CreateTable("Categories")</code>, the <code>Products</code> foreign keys with <code>onDelete: ReferentialAction.Cascade</code> for Brands, the <code>InsertData</code> for the 3 categories, plus all the Identity tables.</p>
+<p><strong>Changing the schema later</strong> (e.g. adding a <code>Description</code> column):</p>
+<ol>
+<li>Add the property to <code>Product</code>.</li>
+<li>Run <code>Add-Migration AddProductDescription</code>.</li>
+<li>Run <code>Update-Database</code>.</li>
+</ol>
+<p>Each migration is a reviewable file in Git. That history is exactly why teams prefer Code First.</p>
+<h2 id="112-controllers-thin-http-in-http-out">1.12 Controllers (thin: HTTP in, HTTP out)</h2>
+<h3 id="controllersauthcontrollercs">Controllers/AuthController.cs</h3>
+<pre><code class="language-csharp">using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using ProductApi.Dtos;
+using ProductApi.Services;
+
+namespace ProductApi.Controllers;
+
+[ApiController]
+[Route(&quot;api/[controller]&quot;)]
+public class AuthController(IAuthService authService) : ControllerBase
+{
+    [HttpPost(&quot;register&quot;)]
+    [EnableRateLimiting(&quot;auth&quot;)]
+    public async Task&lt;ActionResult&lt;AuthResponse&gt;&gt; Register(RegisterRequest request, CancellationToken ct)
+        =&gt; Ok(await authService.RegisterAsync(request, ct));
+
+    [HttpPost(&quot;login&quot;)]
+    [EnableRateLimiting(&quot;auth&quot;)]
+    public async Task&lt;ActionResult&lt;AuthResponse&gt;&gt; Login(LoginRequest request, CancellationToken ct)
+        =&gt; Ok(await authService.LoginAsync(request, ct));
+
+    [HttpPost(&quot;refresh&quot;)]
+    [EnableRateLimiting(&quot;auth&quot;)]
+    public async Task&lt;ActionResult&lt;AuthResponse&gt;&gt; Refresh(RefreshRequest request, CancellationToken ct)
+        =&gt; Ok(await authService.RefreshAsync(request.RefreshToken, ct));
+
+    [Authorize]
+    [HttpPost(&quot;logout&quot;)]
+    public async Task&lt;IActionResult&gt; Logout(RefreshRequest request, CancellationToken ct)
+    {
+        await authService.LogoutAsync(User.FindFirstValue(&quot;sub&quot;)!, request.RefreshToken, ct);
+        return NoContent();
+    }
+
+    [Authorize]
+    [HttpGet(&quot;me&quot;)]
+    public async Task&lt;ActionResult&lt;UserDto&gt;&gt; Me()
+    {
+        var user = await authService.GetUserAsync(User.FindFirstValue(&quot;sub&quot;)!);
+        return user is null ? NotFound() : Ok(user);
+    }
+}
+</code></pre>
+<h3 id="controllerscategoriescontrollercs">Controllers/CategoriesController.cs</h3>
+<pre><code class="language-csharp">using Microsoft.AspNetCore.Mvc;
+using ProductApi.Dtos;
+using ProductApi.Services;
+
+namespace ProductApi.Controllers;
+
+[ApiController]
+[Route(&quot;api/[controller]&quot;)]
+public class CategoriesController(ICategoryService categoryService) : ControllerBase
+{
+    [HttpGet]
+    public async Task&lt;ActionResult&lt;IReadOnlyList&lt;CategoryResponse&gt;&gt;&gt; GetAll(CancellationToken ct)
+        =&gt; Ok(await categoryService.GetAllAsync(ct));
+}
+</code></pre>
+<h3 id="controllersproductscontrollercs">Controllers/ProductsController.cs</h3>
+<pre><code class="language-csharp">using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using ProductApi.Common;
+using ProductApi.Dtos;
+using ProductApi.Services;
+
+namespace ProductApi.Controllers;
+
+[ApiController]
+[Route(&quot;api/[controller]&quot;)]
+public class ProductsController(IProductService productService, IImageService imageService) : ControllerBase
+{
+    [HttpGet]
+    public async Task&lt;ActionResult&lt;PagedResult&lt;ProductResponse&gt;&gt;&gt; GetAll([FromQuery] ProductQuery query, CancellationToken ct)
+        =&gt; Ok(await productService.GetPagedAsync(query, ct));
+
+    [HttpGet(&quot;{id:int}&quot;)]
+    [ProducesResponseType&lt;ProductResponse&gt;(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task&lt;ActionResult&lt;ProductResponse&gt;&gt; GetById(int id, CancellationToken ct)
+    {
+        var product = await productService.GetByIdAsync(id, ct);
+        return product is null ? NotFound() : Ok(product);
+    }
+
+    [HttpPost]
+    [Authorize(Roles = Roles.Admin)]
+    [ProducesResponseType&lt;ProductResponse&gt;(StatusCodes.Status201Created)]
+    public async Task&lt;ActionResult&lt;ProductResponse&gt;&gt; Create(ProductRequest request, CancellationToken ct)
+    {
+        var created = await productService.CreateAsync(request, ct);
+        return CreatedAtAction(nameof(GetById), new { id = created.ProductId }, created);
+    }
+
+    [HttpPut(&quot;{id:int}&quot;)]
+    [Authorize(Roles = Roles.Admin)]
+    public async Task&lt;ActionResult&lt;ProductResponse&gt;&gt; Update(int id, ProductRequest request, CancellationToken ct)
+    {
+        var updated = await productService.UpdateAsync(id, request, ct);
+        return updated is null ? NotFound() : Ok(updated);
+    }
+
+    [HttpDelete(&quot;{id:int}&quot;)]
+    [Authorize(Roles = Roles.Admin)]
+    public async Task&lt;IActionResult&gt; Delete(int id, CancellationToken ct)
+        =&gt; await productService.DeleteAsync(id, ct) ? NoContent() : NotFound();
+
+    [HttpPost(&quot;upload&quot;)]
+    [Authorize(Roles = Roles.Admin)]
+    [RequestSizeLimit(5 * 1024 * 1024)]
+    public async Task&lt;ActionResult&lt;UploadResponse&gt;&gt; Upload(IFormFile file, CancellationToken ct)
+        =&gt; Ok(await imageService.SaveAsync(file, ct));
+}
+</code></pre>
+<p><strong>What <code>[ApiController]</code> does for you:</strong></p>
+<ul>
+<li>Binds the JSON body to <code>ProductRequest</code> automatically.</li>
+<li>Runs validation and returns 400 with the error details, so there's no <code>if (!ModelState.IsValid)</code>.</li>
+<li>Infers <code>[FromForm]</code> for <code>IFormFile</code> parameters.</li>
+</ul>
+<p><code>{id:int}</code> is a <strong>route constraint</strong>: <code>/api/products/abc</code> gives a 404 instead of a binding error.</p>
+<h2 id="113-run-and-test-the-api">1.13 Run and test the API</h2>
+<ol>
+<li>Press F5. Then open:<ul>
+<li><code>https://localhost:&lt;port&gt;/scalar/v1</code> for the interactive API docs.</li>
+<li><code>https://localhost:&lt;port&gt;/health</code>, which should show <code>Healthy</code>.</li>
+</ul>
+</li>
+<li>Replace the template's <code>ProductApi.http</code> with the file below and click <strong>Send Request</strong> above each block:</li>
+</ol>
+<pre><code class="language-http">@baseUrl = https://localhost:7001
+
+### Login as admin
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{ &quot;email&quot;: &quot;admin@producthub.com&quot;, &quot;password&quot;: &quot;Admin@12345&quot; }
+
+### Categories (public)
+GET {{baseUrl}}/api/categories
+
+### Create product (admin)
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{login.response.body.$.accessToken}}
+Content-Type: application/json
+
+{
+  &quot;productName&quot;: &quot;Gaming Laptop&quot;,
+  &quot;manufacturingDate&quot;: &quot;2025-06-15&quot;,
+  &quot;serialNo&quot;: &quot;GL-2025-001&quot;,
+  &quot;imageFileName&quot;: null,
+  &quot;isAvailable&quot;: true,
+  &quot;categoryId&quot;: 1,
+  &quot;price&quot;: 1499.99,
+  &quot;brands&quot;: [ { &quot;brandName&quot;: &quot;Asus&quot;, &quot;stock&quot;: 12 }, { &quot;brandName&quot;: &quot;Lenovo&quot;, &quot;stock&quot;: 7 } ]
+}
+
+### Paged + filtered list (public)
+GET {{baseUrl}}/api/products?search=laptop&amp;sortBy=price&amp;sortDir=desc&amp;page=1&amp;pageSize=5
+
+### Same serial again → expect 409
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{login.response.body.$.accessToken}}
+Content-Type: application/json
+
+{ &quot;productName&quot;: &quot;Copy&quot;, &quot;manufacturingDate&quot;: &quot;2025-01-01&quot;, &quot;serialNo&quot;: &quot;GL-2025-001&quot;, &quot;isAvailable&quot;: true, &quot;categoryId&quot;: 1, &quot;price&quot;: 10, &quot;brands&quot;: [] }
+
+### No token → expect 401
+DELETE {{baseUrl}}/api/products/1
+
+### Refresh tokens
+POST {{baseUrl}}/api/auth/refresh
+Content-Type: application/json
+
+{ &quot;refreshToken&quot;: &quot;{{login.response.body.$.refreshToken}}&quot; }
+</code></pre>
+<p>Change <code>7001</code> to your port, from <code>Properties/launchSettings.json</code>.</p>
+<p><strong>API done-checklist:</strong></p>
+<ul>
+<li class="task"><input type="checkbox"> Login returns tokens.</li>
+<li class="task"><input type="checkbox"> Create returns 201.</li>
+<li class="task"><input type="checkbox"> Duplicate serial returns 409.</li>
+<li class="task"><input type="checkbox"> No token returns 401.</li>
+<li class="task"><input type="checkbox"> A registered normal user gets 403 on POST.</li>
+<li class="task"><input type="checkbox"> Empty <code>productName</code> returns 400 with <code>errors</code>.</li>
+<li class="task"><input type="checkbox"> Image upload works in Scalar (Authenticate first, then POST /upload).</li>
+<li class="task"><input type="checkbox"> Commit to Git.</li>
+</ul>
+<hr />
+<h1 id="part-2-angular-client">PART 2 — Angular Client</h1>
+<h2 id="20-modern-angular-concepts">2.0 Modern Angular concepts</h2>
+<p>Angular has changed a lot since 2023. Older tutorials use NgModules, <code>*ngIf</code>/<code>*ngFor</code>, constructor injection and class-based guards/interceptors. <strong>Today's style:</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Modern way (used here)</th>
+<th>Old way (you'll still see it in older code)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>App structure</td>
+<td><strong>Standalone components</strong> (each component lists its own <code>imports</code>)</td>
+<td><code>NgModule</code>s</td>
+</tr>
+<tr>
+<td>State in components</td>
+<td><strong>Signals</strong>: <code>count = signal(0)</code>, read with <code>count()</code>, write with <code>.set()</code></td>
+<td>Plain fields + Zone.js</td>
+</tr>
+<tr>
+<td>Templates</td>
+<td><strong>Built-in control flow</strong>: <code>@if</code>, <code>@for</code>, <code>@empty</code></td>
+<td><code>*ngIf</code>, <code>*ngFor</code></td>
+</tr>
+<tr>
+<td>Dependency injection</td>
+<td><strong><code>inject()</code></strong> function</td>
+<td>Constructor parameters</td>
+</tr>
+<tr>
+<td>Interceptors, guards</td>
+<td><strong>Functions</strong> (<code>HttpInterceptorFn</code>, <code>CanActivateFn</code>)</td>
+<td>Classes</td>
+</tr>
+<tr>
+<td>Routing</td>
+<td><strong>Lazy-loaded</strong> standalone components (<code>loadComponent</code>)</td>
+<td>Lazy NgModules</td>
+</tr>
+<tr>
+<td>Change detection</td>
+<td><strong>Zoneless</strong> (default in new apps), driven by signals</td>
+<td>Zone.js</td>
+</tr>
+<tr>
+<td>Forms</td>
+<td><strong>Typed Reactive Forms</strong> with <code>NonNullableFormBuilder</code></td>
+<td>Untyped forms</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Signals in one paragraph:</strong> a signal is a value that tells Angular when it changes. <code>products = signal&lt;Product[]&gt;([])</code> creates one. The template reads it with <code>products()</code>, and code changes it with <code>this.products.set(data)</code>. Angular re-renders exactly the parts that used it. <code>computed(() =&gt; ...)</code> derives a value from other signals and updates automatically.</p>
+<p><strong>Data flow in this Angular app:</strong></p>
+<pre><code>Component (signals hold UI state)
+   │ calls
+Service (ProductService, AuthService)  ← one place per API resource; returns Observables
+   │ uses
+HttpClient
+   │ passes through
+authInterceptor (adds Bearer token; on 401 → refresh → retry)
+   │
+.NET API
+</code></pre>
+<h2 id="21-create-the-project">2.1 Create the project</h2>
+<pre><code class="language-bash">npm install -g @angular/cli
+cd ProductHub
+ng new product-angular --style=css --ssr=false
+cd product-angular
+npm install bootstrap
+ng generate environments
+</code></pre>
+<ul>
+<li><strong>Zoneless?</strong> If the CLI asks whether to create a zoneless app, answer <strong>Yes</strong>. (It's the default in recent versions.)</li>
+<li><strong>AI tools?</strong> If it asks about configuring AI tools, choose <strong>None</strong>.</li>
+</ul>
+<p><strong>Add Bootstrap.</strong> In <code>angular.json</code>, find <code>"styles"</code> under <code>build → options</code> and make it:</p>
+<pre><code class="language-json">&quot;styles&quot;: [
+  &quot;node_modules/bootstrap/dist/css/bootstrap.min.css&quot;,
+  &quot;src/styles.css&quot;
+]
+</code></pre>
+<p><strong>Set the environments:</strong></p>
+<p><strong>src/environments/environment.development.ts</strong> (used by <code>ng serve</code>):</p>
+<pre><code class="language-ts">export const environment = {
+  production: false,
+  apiUrl: 'https://localhost:7001/api',   // your API's https port
+};
+</code></pre>
+<p><strong>src/environments/environment.ts</strong> (used by <code>ng build</code> for production):</p>
+<pre><code class="language-ts">export const environment = {
+  production: true,
+  apiUrl: 'https://api.your-domain.com/api',
+};
+</code></pre>
+<p><strong>File naming:</strong> recent CLIs generate <code>product-list.ts</code> with class <code>ProductList</code>. Older CLIs generate <code>product-list.component.ts</code> with class <code>ProductListComponent</code>. Both work; just keep your imports consistent. This guide uses the new style.</p>
+<h2 id="22-folder-structure">2.2 Folder structure</h2>
+<pre><code>src/app/
+├─ core/                          app-wide, created once
+│  ├─ models/        auth.model.ts, product.model.ts
+│  ├─ services/      auth.service.ts, product.service.ts, category.service.ts
+│  ├─ interceptors/  auth.interceptor.ts
+│  ├─ guards/        auth.guards.ts
+│  └─ utils/         error-message.ts
+├─ features/                      one folder per feature (screen group)
+│  ├─ auth/login/                 login.ts, login.html
+│  ├─ auth/register/              register.ts, register.html
+│  └─ products/
+│     ├─ product-list/            product-list.ts, product-list.html
+│     └─ product-form/            product-form.ts, product-form.html   (create + edit)
+├─ app.ts, app.html               shell: navbar + &lt;router-outlet&gt;
+├─ app.config.ts                  providers (router, http, interceptors)
+└─ app.routes.ts                  URL → component map
+</code></pre>
+<p>Create the components with the CLI. They're standalone by default:</p>
+<pre><code class="language-bash">ng g c features/auth/login
+ng g c features/auth/register
+ng g c features/products/product-list
+ng g c features/products/product-form
+</code></pre>
+<p>Create the <code>core/</code> files by hand; their names are shown in each heading below.</p>
+<h2 id="23-models-mirror-the-api-dtos">2.3 Models (mirror the API DTOs)</h2>
+<p><strong>core/models/auth.model.ts</strong></p>
+<pre><code class="language-ts">export interface User {
+  id: string;
+  email: string;
+  fullName: string;
+  roles: string[];
+}
+
+export interface AuthResponse {
+  accessToken: string;
+  accessTokenExpiresAt: string;
+  refreshToken: string;
+  refreshTokenExpiresAt: string;
+  user: User;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  fullName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+</code></pre>
+<p><strong>core/models/product.model.ts</strong></p>
+<pre><code class="language-ts">export interface Brand {
+  brandId?: number;
+  brandName: string;
+  stock: number;
+}
+
+export interface Product {
+  productId: number;
+  productName: string;
+  manufacturingDate: string;   // &quot;yyyy-MM-dd&quot;
+  serialNo: string;
+  imageFileName: string;
+  imageUrl: string;            // full URL for &lt;img&gt;
+  isAvailable: boolean;
+  categoryId: number;
+  categoryName: string;
+  price: number;
+  totalStock: number;
+  brands: Brand[];
+}
+
+export interface ProductRequest {
+  productName: string;
+  manufacturingDate: string;
+  serialNo: string;
+  imageFileName: string | null;
+  isAvailable: boolean;
+  categoryId: number;
+  price: number;
+  brands: { brandName: string; stock: number }[];
+}
+
+export interface Category {
+  categoryId: number;
+  categoryName: string;
+}
+
+export interface PagedResult&lt;T&gt; {
+  items: T[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+  hasPrevious: boolean;
+  hasNext: boolean;
+}
+
+export interface ProductQuery {
+  search?: string;
+  categoryId?: number | null;
+  sortBy?: string;
+  sortDir?: 'asc' | 'desc';
+  page: number;
+  pageSize: number;
+}
+
+export interface UploadResponse {
+  fileName: string;
+  url: string;
+}
+</code></pre>
+<h2 id="24-error-helper">2.4 Error helper</h2>
+<p><strong>core/utils/error-message.ts</strong></p>
+<pre><code class="language-ts">import { HttpErrorResponse } from '@angular/common/http';
+
+// Turns any HTTP error (including ProblemDetails) into one readable sentence
+export function getErrorMessage(err: unknown): string {
+  if (err instanceof HttpErrorResponse) {
+    if (err.status === 0) return 'Cannot reach the server. Is the API running?';
+    const body = err.error;
+    if (body?.errors) return Object.values(body.errors).flat().join(' ');   // validation errors
+    if (body?.detail) return body.detail;
+    if (body?.title) return body.title;
+    return err.message;
+  }
+  return 'Something went wrong.';
+}
+</code></pre>
+<h2 id="25-services">2.5 Services</h2>
+<p><strong>core/services/auth.service.ts</strong></p>
+<pre><code class="language-ts">import { computed, inject, Injectable, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { Observable, tap, throwError } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { AuthResponse, LoginRequest, RegisterRequest } from '../models/auth.model';
+
+const STORAGE_KEY = 'auth';
+
+@Injectable({ providedIn: 'root' })   // one shared instance for the whole app
+export class AuthService {
+  private http = inject(HttpClient);
+  private router = inject(Router);
+  private baseUrl = `${environment.apiUrl}/auth`;
+
+  // The single source of truth for &quot;who is logged in&quot;
+  private authState = signal&lt;AuthResponse | null&gt;(this.readStorage());
+
+  readonly user = computed(() =&gt; this.authState()?.user ?? null);
+  readonly isLoggedIn = computed(() =&gt; this.authState() !== null);
+  readonly isAdmin = computed(() =&gt; this.user()?.roles.includes('Admin') ?? false);
+
+  get accessToken(): string | null {
+    return this.authState()?.accessToken ?? null;
+  }
+
+  login(request: LoginRequest): Observable&lt;AuthResponse&gt; {
+    return this.http.post&lt;AuthResponse&gt;(`${this.baseUrl}/login`, request).pipe(tap((res) =&gt; this.save(res)));
+  }
+
+  register(request: RegisterRequest): Observable&lt;AuthResponse&gt; {
+    return this.http.post&lt;AuthResponse&gt;(`${this.baseUrl}/register`, request).pipe(tap((res) =&gt; this.save(res)));
+  }
+
+  refresh(): Observable&lt;AuthResponse&gt; {
+    const refreshToken = this.authState()?.refreshToken;
+    if (!refreshToken) return throwError(() =&gt; new Error('No refresh token'));
+    return this.http
+      .post&lt;AuthResponse&gt;(`${this.baseUrl}/refresh`, { refreshToken })
+      .pipe(tap((res) =&gt; this.save(res)));
+  }
+
+  logout(): void {
+    const refreshToken = this.authState()?.refreshToken;
+    if (refreshToken) {
+      // Tell the API to revoke the refresh token; ignore failures (we log out locally anyway)
+      this.http.post(`${this.baseUrl}/logout`, { refreshToken }).subscribe({ error: () =&gt; {} });
+    }
+    this.clear();
+    this.router.navigate(['/login']);
+  }
+
+  clear(): void {
+    localStorage.removeItem(STORAGE_KEY);
+    this.authState.set(null);
+  }
+
+  private save(res: AuthResponse): void {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(res));
+    this.authState.set(res);
+  }
+
+  private readStorage(): AuthResponse | null {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as AuthResponse) : null;
+  }
+}
+</code></pre>
+<p><strong>About localStorage:</strong> it keeps you logged in across page refreshes, and it's common in SPAs. The trade-off is that any script running on the page (an XSS attack) could read it. The stronger alternative is a refresh token in an <strong>HttpOnly cookie</strong>, a good "next level" exercise. Short access-token lifetimes limit the damage either way.</p>
+<p><strong>core/services/category.service.ts</strong></p>
+<pre><code class="language-ts">import { inject, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { Category } from '../models/product.model';
+
+@Injectable({ providedIn: 'root' })
+export class CategoryService {
+  private http = inject(HttpClient);
+
+  getAll() {
+    return this.http.get&lt;Category[]&gt;(`${environment.apiUrl}/categories`);
+  }
+}
+</code></pre>
+<p><strong>core/services/product.service.ts</strong></p>
+<pre><code class="language-ts">import { inject, Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { PagedResult, Product, ProductQuery, ProductRequest, UploadResponse } from '../models/product.model';
+
+@Injectable({ providedIn: 'root' })
+export class ProductService {
+  private http = inject(HttpClient);
+  private baseUrl = `${environment.apiUrl}/products`;
+
+  getPaged(query: ProductQuery) {
+    let params = new HttpParams().set('page', query.page).set('pageSize', query.pageSize);
+    if (query.search) params = params.set('search', query.search);
+    if (query.categoryId) params = params.set('categoryId', query.categoryId);
+    if (query.sortBy) params = params.set('sortBy', query.sortBy);
+    if (query.sortDir) params = params.set('sortDir', query.sortDir);
+    return this.http.get&lt;PagedResult&lt;Product&gt;&gt;(this.baseUrl, { params });
+  }
+
+  getById(id: number) {
+    return this.http.get&lt;Product&gt;(`${this.baseUrl}/${id}`);
+  }
+
+  create(product: ProductRequest) {
+    return this.http.post&lt;Product&gt;(this.baseUrl, product);
+  }
+
+  update(id: number, product: ProductRequest) {
+    return this.http.put&lt;Product&gt;(`${this.baseUrl}/${id}`, product);
+  }
+
+  delete(id: number) {
+    return this.http.delete&lt;void&gt;(`${this.baseUrl}/${id}`);
+  }
+
+  uploadImage(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);   // must match the API parameter name &quot;file&quot;
+    return this.http.post&lt;UploadResponse&gt;(`${this.baseUrl}/upload`, formData);
+  }
+}
+</code></pre>
+<p><strong>Observables:</strong> <code>HttpClient</code> methods return <strong>Observables</strong>, lazy streams that don't send anything until someone calls <code>.subscribe()</code>. A component subscribes, then puts the result into a signal.</p>
+<h2 id="26-interceptor-token-silent-refresh">2.6 Interceptor (token + silent refresh)</h2>
+<p><strong>core/interceptors/auth.interceptor.ts</strong></p>
+<pre><code class="language-ts">import { HttpErrorResponse, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { catchError, finalize, Observable, shareReplay, switchMap, throwError } from 'rxjs';
+import { AuthService } from '../services/auth.service';
+import { AuthResponse } from '../models/auth.model';
+
+// Shared between requests so that 5 parallel 401s trigger only ONE refresh call
+let refreshInFlight$: Observable&lt;AuthResponse&gt; | null = null;
+
+const AUTH_ENDPOINTS = ['/auth/login', '/auth/register', '/auth/refresh'];
+
+function withToken(req: HttpRequest&lt;unknown&gt;, token: string | null) {
+  return token ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : req;
+}
+
+export const authInterceptor: HttpInterceptorFn = (req, next) =&gt; {
+  const auth = inject(AuthService);
+  const isAuthEndpoint = AUTH_ENDPOINTS.some((url) =&gt; req.url.includes(url));
+
+  return next(withToken(req, auth.accessToken)).pipe(
+    catchError((error: HttpErrorResponse) =&gt; {
+      // Only handle &quot;token expired&quot; for logged-in users on normal endpoints
+      if (error.status !== 401 || isAuthEndpoint || !auth.isLoggedIn()) {
+        return throwError(() =&gt; error);
+      }
+
+      refreshInFlight$ ??= auth.refresh().pipe(
+        finalize(() =&gt; (refreshInFlight$ = null)),
+        shareReplay(1)
+      );
+
+      return refreshInFlight$.pipe(
+        switchMap((res) =&gt; next(withToken(req, res.accessToken))),   // retry with the new token
+        catchError((refreshError) =&gt; {
+          auth.clear();                     // refresh failed → session is over
+          window.location.href = '/login';
+          return throwError(() =&gt; refreshError);
+        })
+      );
+    })
+  );
+};
+</code></pre>
+<p><strong>How the interceptor works, step by step:</strong></p>
+<ol>
+<li><strong>Every</strong> request passes through this function.</li>
+<li>It attaches the token and sends the request.</li>
+<li>If the response is 401, it refreshes the tokens <em>once</em> and retries the original request.</li>
+<li>If the refresh also fails, the session is over: it clears storage and sends the user to login.</li>
+</ol>
+<p>Components never think about tokens.</p>
+<h2 id="27-guards">2.7 Guards</h2>
+<p><strong>core/guards/auth.guards.ts</strong></p>
+<pre><code class="language-ts">import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
+
+export const authGuard: CanActivateFn = (_route, state) =&gt; {
+  const auth = inject(AuthService);
+  return auth.isLoggedIn()
+    ? true
+    : inject(Router).createUrlTree(['/login'], { queryParams: { returnUrl: state.url } });
+};
+
+export const adminGuard: CanActivateFn = (_route, state) =&gt; {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  if (!auth.isLoggedIn()) return router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } });
+  return auth.isAdmin() ? true : router.createUrlTree(['/products']);
+};
+</code></pre>
+<p><strong>Guards are UX, not security.</strong> They stop a normal user from <em>seeing</em> the admin pages. The real protection is the API's <code>[Authorize(Roles = "Admin")]</code>, because anyone can edit JavaScript in their own browser.</p>
+<h2 id="28-routes-and-app-configuration">2.8 Routes and app configuration</h2>
+<p><strong>app.routes.ts</strong></p>
+<pre><code class="language-ts">import { Routes } from '@angular/router';
+import { adminGuard } from './core/guards/auth.guards';
+
+export const routes: Routes = [
+  { path: '', redirectTo: 'products', pathMatch: 'full' },
+  { path: 'login', loadComponent: () =&gt; import('./features/auth/login/login').then((m) =&gt; m.Login) },
+  { path: 'register', loadComponent: () =&gt; import('./features/auth/register/register').then((m) =&gt; m.Register) },
+  {
+    path: 'products',
+    loadComponent: () =&gt; import('./features/products/product-list/product-list').then((m) =&gt; m.ProductList),
+  },
+  {
+    path: 'products/new',
+    canActivate: [adminGuard],
+    loadComponent: () =&gt; import('./features/products/product-form/product-form').then((m) =&gt; m.ProductForm),
+  },
+  {
+    path: 'products/:id/edit',
+    canActivate: [adminGuard],
+    loadComponent: () =&gt; import('./features/products/product-form/product-form').then((m) =&gt; m.ProductForm),
+  },
+  { path: '**', redirectTo: 'products' },
+];
+</code></pre>
+<p><code>loadComponent</code> means <strong>lazy loading</strong>: each page's code downloads only when the user first visits it, so the app starts faster.</p>
+<p><strong>app.config.ts.</strong> Keep the providers the CLI generated (for example <code>provideBrowserGlobalErrorListeners()</code> or a zoneless provider) and make sure these are present:</p>
+<pre><code class="language-ts">import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { routes } from './app.routes';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideBrowserGlobalErrorListeners(),                  // generated by the CLI; keep what yours has
+    provideRouter(routes, withComponentInputBinding()),    // route params → component inputs
+    provideHttpClient(withInterceptors([authInterceptor])),
+  ],
+};
+</code></pre>
+<h2 id="29-app-shell-navbar">2.9 App shell (navbar)</h2>
+<p><strong>app.ts</strong></p>
+<pre><code class="language-ts">import { Component, inject } from '@angular/core';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { AuthService } from './core/services/auth.service';
+
+@Component({
+  selector: 'app-root',
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  templateUrl: './app.html',
+})
+export class App {
+  auth = inject(AuthService);
+}
+</code></pre>
+<p><strong>app.html</strong> (replace all the template content)</p>
+<pre><code class="language-html">&lt;nav class=&quot;navbar navbar-expand navbar-dark bg-dark mb-4&quot;&gt;
+  &lt;div class=&quot;container&quot;&gt;
+    &lt;a class=&quot;navbar-brand&quot; routerLink=&quot;/products&quot;&gt;ProductHub&lt;/a&gt;
+
+    &lt;ul class=&quot;navbar-nav me-auto&quot;&gt;
+      &lt;li class=&quot;nav-item&quot;&gt;&lt;a class=&quot;nav-link&quot; routerLink=&quot;/products&quot; routerLinkActive=&quot;active&quot;&gt;Products&lt;/a&gt;&lt;/li&gt;
+      @if (auth.isAdmin()) {
+        &lt;li class=&quot;nav-item&quot;&gt;&lt;a class=&quot;nav-link&quot; routerLink=&quot;/products/new&quot; routerLinkActive=&quot;active&quot;&gt;New Product&lt;/a&gt;&lt;/li&gt;
+      }
+    &lt;/ul&gt;
+
+    @if (auth.user(); as user) {
+      &lt;span class=&quot;navbar-text me-3&quot;&gt;Hi, {{ user.fullName }} @if (auth.isAdmin()) { &lt;span class=&quot;badge bg-warning text-dark&quot;&gt;Admin&lt;/span&gt; }&lt;/span&gt;
+      &lt;button class=&quot;btn btn-outline-light btn-sm&quot; (click)=&quot;auth.logout()&quot;&gt;Logout&lt;/button&gt;
+    } @else {
+      &lt;a class=&quot;btn btn-outline-light btn-sm me-2&quot; routerLink=&quot;/login&quot;&gt;Login&lt;/a&gt;
+      &lt;a class=&quot;btn btn-light btn-sm&quot; routerLink=&quot;/register&quot;&gt;Register&lt;/a&gt;
+    }
+  &lt;/div&gt;
+&lt;/nav&gt;
+
+&lt;main class=&quot;container&quot;&gt;
+  &lt;router-outlet /&gt;
+&lt;/main&gt;
+</code></pre>
+<h2 id="210-login-and-register">2.10 Login and Register</h2>
+<p><strong>features/auth/login/login.ts</strong></p>
+<pre><code class="language-ts">import { Component, inject, signal } from '@angular/core';
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
+import { getErrorMessage } from '../../../core/utils/error-message';
+
+@Component({
+  selector: 'app-login',
+  imports: [ReactiveFormsModule, RouterLink],
+  templateUrl: './login.html',
+})
+export class Login {
+  private fb = inject(NonNullableFormBuilder);
+  private auth = inject(AuthService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
+  loading = signal(false);
+  error = signal('');
+
+  form = this.fb.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', Validators.required],
+  });
+
+  onSubmit() {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();   // show all error messages
+      return;
+    }
+    this.loading.set(true);
+    this.error.set('');
+
+    this.auth.login(this.form.getRawValue()).subscribe({
+      next: () =&gt; {
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/products';
+        this.router.navigateByUrl(returnUrl);
+      },
+      error: (err) =&gt; {
+        this.error.set(getErrorMessage(err));
+        this.loading.set(false);
+      },
+    });
+  }
+}
+</code></pre>
+<p><strong>features/auth/login/login.html</strong></p>
+<pre><code class="language-html">&lt;div class=&quot;row justify-content-center&quot;&gt;
+  &lt;div class=&quot;col-md-5&quot;&gt;
+    &lt;h3 class=&quot;mb-3&quot;&gt;Login&lt;/h3&gt;
+
+    @if (error()) {
+      &lt;div class=&quot;alert alert-danger&quot;&gt;{{ error() }}&lt;/div&gt;
+    }
+
+    &lt;form [formGroup]=&quot;form&quot; (ngSubmit)=&quot;onSubmit()&quot; novalidate&gt;
+      &lt;div class=&quot;mb-3&quot;&gt;
+        &lt;label class=&quot;form-label&quot;&gt;Email&lt;/label&gt;
+        &lt;input type=&quot;email&quot; class=&quot;form-control&quot; formControlName=&quot;email&quot; /&gt;
+        @if (form.controls.email.touched &amp;&amp; form.controls.email.invalid) {
+          &lt;small class=&quot;text-danger&quot;&gt;Enter a valid email.&lt;/small&gt;
+        }
+      &lt;/div&gt;
+
+      &lt;div class=&quot;mb-3&quot;&gt;
+        &lt;label class=&quot;form-label&quot;&gt;Password&lt;/label&gt;
+        &lt;input type=&quot;password&quot; class=&quot;form-control&quot; formControlName=&quot;password&quot; /&gt;
+        @if (form.controls.password.touched &amp;&amp; form.controls.password.invalid) {
+          &lt;small class=&quot;text-danger&quot;&gt;Password is required.&lt;/small&gt;
+        }
+      &lt;/div&gt;
+
+      &lt;button class=&quot;btn btn-primary w-100&quot; [disabled]=&quot;loading()&quot;&gt;
+        {{ loading() ? 'Signing in...' : 'Login' }}
+      &lt;/button&gt;
+    &lt;/form&gt;
+
+    &lt;p class=&quot;mt-3&quot;&gt;No account? &lt;a routerLink=&quot;/register&quot;&gt;Register&lt;/a&gt;&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+<p><strong>features/auth/register/register.ts</strong></p>
+<pre><code class="language-ts">import { Component, inject, signal } from '@angular/core';
+import { AbstractControl, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
+import { getErrorMessage } from '../../../core/utils/error-message';
+
+// Group-level validator: compares two fields
+function passwordsMatch(group: AbstractControl): ValidationErrors | null {
+  return group.get('password')?.value === group.get('confirmPassword')?.value ? null : { passwordsMismatch: true };
+}
+
+@Component({
+  selector: 'app-register',
+  imports: [ReactiveFormsModule, RouterLink],
+  templateUrl: './register.html',
+})
+export class Register {
+  private fb = inject(NonNullableFormBuilder);
+  private auth = inject(AuthService);
+  private router = inject(Router);
+
+  loading = signal(false);
+  error = signal('');
+
+  form = this.fb.group(
+    {
+      fullName: ['', [Validators.required, Validators.maxLength(100)]],
+      email: ['', [Validators.required, Validators.email]],
+      // Same rules as the API's Identity password policy
+      password: ['', [Validators.required, Validators.minLength(8),
+        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).+$/)]],
+      confirmPassword: ['', Validators.required],
+    },
+    { validators: passwordsMatch }
+  );
+
+  onSubmit() {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+    this.loading.set(true);
+    this.error.set('');
+    this.auth.register(this.form.getRawValue()).subscribe({
+      next: () =&gt; this.router.navigate(['/products']),
+      error: (err) =&gt; {
+        this.error.set(getErrorMessage(err));
+        this.loading.set(false);
+      },
+    });
+  }
+}
+</code></pre>
+<p><strong>features/auth/register/register.html</strong></p>
+<pre><code class="language-html">&lt;div class=&quot;row justify-content-center&quot;&gt;
+  &lt;div class=&quot;col-md-5&quot;&gt;
+    &lt;h3 class=&quot;mb-3&quot;&gt;Create an account&lt;/h3&gt;
+
+    @if (error()) {
+      &lt;div class=&quot;alert alert-danger&quot;&gt;{{ error() }}&lt;/div&gt;
+    }
+
+    &lt;form [formGroup]=&quot;form&quot; (ngSubmit)=&quot;onSubmit()&quot; novalidate&gt;
+      &lt;div class=&quot;mb-3&quot;&gt;
+        &lt;label class=&quot;form-label&quot;&gt;Full Name&lt;/label&gt;
+        &lt;input class=&quot;form-control&quot; formControlName=&quot;fullName&quot; /&gt;
+        @if (form.controls.fullName.touched &amp;&amp; form.controls.fullName.invalid) {
+          &lt;small class=&quot;text-danger&quot;&gt;Full name is required.&lt;/small&gt;
+        }
+      &lt;/div&gt;
+
+      &lt;div class=&quot;mb-3&quot;&gt;
+        &lt;label class=&quot;form-label&quot;&gt;Email&lt;/label&gt;
+        &lt;input type=&quot;email&quot; class=&quot;form-control&quot; formControlName=&quot;email&quot; /&gt;
+        @if (form.controls.email.touched &amp;&amp; form.controls.email.invalid) {
+          &lt;small class=&quot;text-danger&quot;&gt;Enter a valid email.&lt;/small&gt;
+        }
+      &lt;/div&gt;
+
+      &lt;div class=&quot;mb-3&quot;&gt;
+        &lt;label class=&quot;form-label&quot;&gt;Password&lt;/label&gt;
+        &lt;input type=&quot;password&quot; class=&quot;form-control&quot; formControlName=&quot;password&quot; /&gt;
+        @if (form.controls.password.touched &amp;&amp; form.controls.password.invalid) {
+          &lt;small class=&quot;text-danger&quot;&gt;Min 8 characters with upper, lower, digit and symbol.&lt;/small&gt;
+        }
+      &lt;/div&gt;
+
+      &lt;div class=&quot;mb-3&quot;&gt;
+        &lt;label class=&quot;form-label&quot;&gt;Confirm Password&lt;/label&gt;
+        &lt;input type=&quot;password&quot; class=&quot;form-control&quot; formControlName=&quot;confirmPassword&quot; /&gt;
+        @if (form.controls.confirmPassword.touched &amp;&amp; form.hasError('passwordsMismatch')) {
+          &lt;small class=&quot;text-danger&quot;&gt;Passwords do not match.&lt;/small&gt;
+        }
+      &lt;/div&gt;
+
+      &lt;button class=&quot;btn btn-primary w-100&quot; [disabled]=&quot;loading()&quot;&gt;
+        {{ loading() ? 'Creating...' : 'Register' }}
+      &lt;/button&gt;
+    &lt;/form&gt;
+
+    &lt;p class=&quot;mt-3&quot;&gt;Have an account? &lt;a routerLink=&quot;/login&quot;&gt;Login&lt;/a&gt;&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+<h2 id="211-product-list-search-filter-sort-paging-delete">2.11 Product list (search, filter, sort, paging, delete)</h2>
+<p><strong>features/products/product-list/product-list.ts</strong></p>
+<pre><code class="language-ts">import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { CurrencyPipe, DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { ProductService } from '../../../core/services/product.service';
+import { CategoryService } from '../../../core/services/category.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { Category, Product } from '../../../core/models/product.model';
+import { getErrorMessage } from '../../../core/utils/error-message';
+
+@Component({
+  selector: 'app-product-list',
+  imports: [RouterLink, CurrencyPipe, DatePipe],
+  templateUrl: './product-list.html',
+})
+export class ProductList implements OnInit {
+  private productService = inject(ProductService);
+  private categoryService = inject(CategoryService);
+  auth = inject(AuthService);
+
+  // ---- UI state (signals) ----
+  products = signal&lt;Product[]&gt;([]);
+  categories = signal&lt;Category[]&gt;([]);
+  loading = signal(false);
+  error = signal('');
+
+  // ---- Query state ----
+  search = signal('');
+  categoryId = signal&lt;number | null&gt;(null);
+  sortBy = signal('');
+  sortDir = signal&lt;'asc' | 'desc'&gt;('asc');
+  page = signal(1);
+  readonly pageSize = 5;
+  totalPages = signal(0);
+  totalCount = signal(0);
+
+  pages = computed(() =&gt; Array.from({ length: this.totalPages() }, (_, i) =&gt; i + 1));
+
+  ngOnInit() {
+    this.categoryService.getAll().subscribe((c) =&gt; this.categories.set(c));
+    this.load();
+  }
+
+  load() {
+    this.loading.set(true);
+    this.error.set('');
+    this.productService
+      .getPaged({
+        search: this.search(),
+        categoryId: this.categoryId(),
+        sortBy: this.sortBy(),
+        sortDir: this.sortDir(),
+        page: this.page(),
+        pageSize: this.pageSize,
+      })
+      .subscribe({
+        next: (result) =&gt; {
+          this.products.set(result.items);
+          this.totalPages.set(result.totalPages);
+          this.totalCount.set(result.totalCount);
+          this.loading.set(false);
+        },
+        error: (err) =&gt; {
+          this.error.set(getErrorMessage(err));
+          this.loading.set(false);
+        },
+      });
+  }
+
+  onSearch(value: string) {
+    this.search.set(value.trim());
+    this.page.set(1);   // new search → back to page 1
+    this.load();
+  }
+
+  onCategoryChange(value: string) {
+    this.categoryId.set(value ? Number(value) : null);
+    this.page.set(1);
+    this.load();
+  }
+
+  sort(column: string) {
+    if (this.sortBy() === column) {
+      this.sortDir.set(this.sortDir() === 'asc' ? 'desc' : 'asc');
+    } else {
+      this.sortBy.set(column);
+      this.sortDir.set('asc');
+    }
+    this.load();
+  }
+
+  sortIcon(column: string) {
+    return this.sortBy() !== column ? '' : this.sortDir() === 'asc' ? '▲' : '▼';
+  }
+
+  goToPage(page: number) {
+    if (page &lt; 1 || page &gt; this.totalPages()) return;
+    this.page.set(page);
+    this.load();
+  }
+
+  delete(product: Product) {
+    if (!confirm(`Delete &quot;${product.productName}&quot;?`)) return;
+    this.productService.delete(product.productId).subscribe({
+      next: () =&gt; {
+        // If we deleted the last item on this page, step back one page
+        if (this.products().length === 1 &amp;&amp; this.page() &gt; 1) this.page.set(this.page() - 1);
+        this.load();
+      },
+      error: (err) =&gt; this.error.set(getErrorMessage(err)),
+    });
+  }
+}
+</code></pre>
+<p><strong>features/products/product-list/product-list.html</strong></p>
+<pre><code class="language-html">&lt;div class=&quot;d-flex justify-content-between align-items-center mb-3&quot;&gt;
+  &lt;h3 class=&quot;mb-0&quot;&gt;Products &lt;small class=&quot;text-muted fs-6&quot;&gt;({{ totalCount() }})&lt;/small&gt;&lt;/h3&gt;
+  @if (auth.isAdmin()) {
+    &lt;a routerLink=&quot;/products/new&quot; class=&quot;btn btn-primary&quot;&gt;+ New Product&lt;/a&gt;
+  }
+&lt;/div&gt;
+
+&lt;!-- Search + filter --&gt;
+&lt;div class=&quot;row g-2 mb-3&quot;&gt;
+  &lt;div class=&quot;col-md-6&quot;&gt;
+    &lt;div class=&quot;input-group&quot;&gt;
+      &lt;input #searchBox class=&quot;form-control&quot; placeholder=&quot;Search name or serial no...&quot;
+             (keyup.enter)=&quot;onSearch(searchBox.value)&quot; /&gt;
+      &lt;button class=&quot;btn btn-outline-secondary&quot; (click)=&quot;onSearch(searchBox.value)&quot;&gt;Search&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;col-md-4&quot;&gt;
+    &lt;select #categorySelect class=&quot;form-select&quot; (change)=&quot;onCategoryChange(categorySelect.value)&quot;&gt;
+      &lt;option value=&quot;&quot;&gt;All categories&lt;/option&gt;
+      @for (c of categories(); track c.categoryId) {
+        &lt;option [value]=&quot;c.categoryId&quot;&gt;{{ c.categoryName }}&lt;/option&gt;
+      }
+    &lt;/select&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+@if (error()) {
+  &lt;div class=&quot;alert alert-danger&quot;&gt;{{ error() }}&lt;/div&gt;
+}
+
+@if (loading()) {
+  &lt;p&gt;Loading...&lt;/p&gt;
+} @else {
+  &lt;div class=&quot;table-responsive&quot;&gt;
+    &lt;table class=&quot;table table-bordered table-striped align-middle&quot;&gt;
+      &lt;thead class=&quot;table-dark&quot;&gt;
+        &lt;tr&gt;
+          &lt;th&gt;Image&lt;/th&gt;
+          &lt;th role=&quot;button&quot; (click)=&quot;sort('name')&quot;&gt;Name {{ sortIcon('name') }}&lt;/th&gt;
+          &lt;th&gt;Serial No&lt;/th&gt;
+          &lt;th role=&quot;button&quot; (click)=&quot;sort('date')&quot;&gt;Mfg Date {{ sortIcon('date') }}&lt;/th&gt;
+          &lt;th&gt;Category&lt;/th&gt;
+          &lt;th role=&quot;button&quot; (click)=&quot;sort('price')&quot;&gt;Price {{ sortIcon('price') }}&lt;/th&gt;
+          &lt;th&gt;Available&lt;/th&gt;
+          &lt;th&gt;Brands&lt;/th&gt;
+          @if (auth.isAdmin()) { &lt;th&gt;Actions&lt;/th&gt; }
+        &lt;/tr&gt;
+      &lt;/thead&gt;
+      &lt;tbody&gt;
+        @for (p of products(); track p.productId) {
+          &lt;tr&gt;
+            &lt;td&gt;&lt;img [src]=&quot;p.imageUrl&quot; [alt]=&quot;p.productName&quot; width=&quot;70&quot; class=&quot;img-thumbnail&quot; /&gt;&lt;/td&gt;
+            &lt;td&gt;{{ p.productName }}&lt;/td&gt;
+            &lt;td&gt;{{ p.serialNo }}&lt;/td&gt;
+            &lt;td&gt;{{ p.manufacturingDate | date: 'mediumDate' }}&lt;/td&gt;
+            &lt;td&gt;{{ p.categoryName }}&lt;/td&gt;
+            &lt;td&gt;{{ p.price | currency }}&lt;/td&gt;
+            &lt;td&gt;
+              &lt;span class=&quot;badge&quot; [class.bg-success]=&quot;p.isAvailable&quot; [class.bg-secondary]=&quot;!p.isAvailable&quot;&gt;
+                {{ p.isAvailable ? 'Yes' : 'No' }}
+              &lt;/span&gt;
+            &lt;/td&gt;
+            &lt;td&gt;
+              @for (b of p.brands; track b.brandId) {
+                &lt;div&gt;{{ b.brandName }} &lt;small class=&quot;text-muted&quot;&gt;({{ b.stock }})&lt;/small&gt;&lt;/div&gt;
+              } @empty {
+                &lt;small class=&quot;text-muted&quot;&gt;None&lt;/small&gt;
+              }
+            &lt;/td&gt;
+            @if (auth.isAdmin()) {
+              &lt;td class=&quot;text-nowrap&quot;&gt;
+                &lt;a [routerLink]=&quot;['/products', p.productId, 'edit']&quot; class=&quot;btn btn-sm btn-warning me-1&quot;&gt;Edit&lt;/a&gt;
+                &lt;button class=&quot;btn btn-sm btn-danger&quot; (click)=&quot;delete(p)&quot;&gt;Delete&lt;/button&gt;
+              &lt;/td&gt;
+            }
+          &lt;/tr&gt;
+        } @empty {
+          &lt;tr&gt;&lt;td colspan=&quot;9&quot; class=&quot;text-center text-muted&quot;&gt;No products found.&lt;/td&gt;&lt;/tr&gt;
+        }
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+  &lt;/div&gt;
+
+  &lt;!-- Pagination --&gt;
+  @if (totalPages() &gt; 1) {
+    &lt;nav&gt;
+      &lt;ul class=&quot;pagination&quot;&gt;
+        &lt;li class=&quot;page-item&quot; [class.disabled]=&quot;page() === 1&quot;&gt;
+          &lt;button class=&quot;page-link&quot; (click)=&quot;goToPage(page() - 1)&quot;&gt;Previous&lt;/button&gt;
+        &lt;/li&gt;
+        @for (n of pages(); track n) {
+          &lt;li class=&quot;page-item&quot; [class.active]=&quot;n === page()&quot;&gt;
+            &lt;button class=&quot;page-link&quot; (click)=&quot;goToPage(n)&quot;&gt;{{ n }}&lt;/button&gt;
+          &lt;/li&gt;
+        }
+        &lt;li class=&quot;page-item&quot; [class.disabled]=&quot;page() === totalPages()&quot;&gt;
+          &lt;button class=&quot;page-link&quot; (click)=&quot;goToPage(page() + 1)&quot;&gt;Next&lt;/button&gt;
+        &lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/nav&gt;
+  }
+}
+</code></pre>
+<p><code>#searchBox</code> is a <strong>template reference variable</strong>. It gives the template direct access to that <code>&lt;input&gt;</code> element, so no extra form setup is needed for a simple search box.</p>
+<h2 id="212-product-form-create-edit-in-one-component">2.12 Product form (create + edit in one component)</h2>
+<p><strong>features/products/product-form/product-form.ts</strong></p>
+<pre><code class="language-ts">import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { ProductService } from '../../../core/services/product.service';
+import { CategoryService } from '../../../core/services/category.service';
+import { Brand, Category } from '../../../core/models/product.model';
+import { getErrorMessage } from '../../../core/utils/error-message';
+
+@Component({
+  selector: 'app-product-form',
+  imports: [ReactiveFormsModule, RouterLink],
+  templateUrl: './product-form.html',
+})
+export class ProductForm implements OnInit {
+  // Filled automatically from the route &quot;products/:id/edit&quot; (withComponentInputBinding)
+  id = input&lt;string&gt;();
+
+  private fb = inject(NonNullableFormBuilder);
+  private productService = inject(ProductService);
+  private categoryService = inject(CategoryService);
+  private router = inject(Router);
+
+  isEdit = computed(() =&gt; !!this.id());
+  categories = signal&lt;Category[]&gt;([]);
+  imagePreview = signal&lt;string | null&gt;(null);
+  saving = signal(false);
+  uploading = signal(false);
+  error = signal('');
+
+  form = this.fb.group({
+    productName: ['', [Validators.required, Validators.maxLength(100)]],
+    manufacturingDate: [new Date().toISOString().slice(0, 10), Validators.required],
+    serialNo: ['', [Validators.required, Validators.maxLength(50)]],
+    imageFileName: this.fb.control&lt;string | null&gt;(null),
+    isAvailable: [true],
+    categoryId: [0, Validators.min(1)],
+    price: [0, [Validators.required, Validators.min(0.01)]],
+    brands: this.fb.array([this.createBrandGroup()]),
+  });
+
+  get brands() {
+    return this.form.controls.brands;
+  }
+
+  ngOnInit() {
+    this.categoryService.getAll().subscribe((c) =&gt; this.categories.set(c));
+
+    if (this.isEdit()) {
+      this.productService.getById(Number(this.id())).subscribe({
+        next: (p) =&gt; {
+          this.form.patchValue({
+            productName: p.productName,
+            manufacturingDate: p.manufacturingDate,
+            serialNo: p.serialNo,
+            imageFileName: p.imageFileName,
+            isAvailable: p.isAvailable,
+            categoryId: p.categoryId,
+            price: p.price,
+          });
+          // patchValue can't add rows to a FormArray, so rebuild it
+          this.brands.clear();
+          p.brands.forEach((b) =&gt; this.brands.push(this.createBrandGroup(b)));
+          this.imagePreview.set(p.imageUrl);
+        },
+        error: (err) =&gt; this.error.set(getErrorMessage(err)),
+      });
+    }
+  }
+
+  createBrandGroup(brand?: Brand) {
+    return this.fb.group({
+      brandName: [brand?.brandName ?? '', [Validators.required, Validators.maxLength(100)]],
+      stock: [brand?.stock ?? 0, [Validators.required, Validators.min(0)]],
+    });
+  }
+
+  addBrand() {
+    this.brands.push(this.createBrandGroup());
+  }
+
+  removeBrand(index: number) {
+    this.brands.removeAt(index);
+  }
+
+  // Step 1 of saving: upload the image immediately, keep the returned file name
+  onFileSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    this.uploading.set(true);
+    this.error.set('');
+    this.productService.uploadImage(file).subscribe({
+      next: (res) =&gt; {
+        this.form.controls.imageFileName.setValue(res.fileName);
+        this.imagePreview.set(res.url);
+        this.uploading.set(false);
+      },
+      error: (err) =&gt; {
+        this.error.set(getErrorMessage(err));
+        this.uploading.set(false);
+      },
+    });
+  }
+
+  isInvalid(path: string) {
+    const control = this.form.get(path);
+    return !!control &amp;&amp; control.invalid &amp;&amp; control.touched;
+  }
+
+  // Step 2: send the whole form (including imageFileName) as JSON
+  onSubmit() {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+    this.saving.set(true);
+    this.error.set('');
+
+    const request = this.form.getRawValue();
+    const save$ = this.isEdit()
+      ? this.productService.update(Number(this.id()), request)
+      : this.productService.create(request);
+
+    save$.subscribe({
+      next: () =&gt; this.router.navigate(['/products']),
+      error: (err) =&gt; {
+        this.error.set(getErrorMessage(err));
+        this.saving.set(false);
+      },
+    });
+  }
+}
+</code></pre>
+<p><strong>features/products/product-form/product-form.html</strong></p>
+<pre><code class="language-html">&lt;h3 class=&quot;mb-3&quot;&gt;{{ isEdit() ? 'Edit Product' : 'Create Product' }}&lt;/h3&gt;
+
+@if (error()) {
+  &lt;div class=&quot;alert alert-danger&quot;&gt;{{ error() }}&lt;/div&gt;
+}
+
+&lt;form [formGroup]=&quot;form&quot; (ngSubmit)=&quot;onSubmit()&quot; novalidate&gt;
+  &lt;div class=&quot;row&quot;&gt;
+    &lt;!-- Left: product fields --&gt;
+    &lt;div class=&quot;col-md-7&quot;&gt;
+      &lt;div class=&quot;mb-3&quot;&gt;
+        &lt;label class=&quot;form-label&quot;&gt;Product Name&lt;/label&gt;
+        &lt;input class=&quot;form-control&quot; formControlName=&quot;productName&quot; [class.is-invalid]=&quot;isInvalid('productName')&quot; /&gt;
+        @if (isInvalid('productName')) { &lt;div class=&quot;invalid-feedback&quot;&gt;Required, max 100 characters.&lt;/div&gt; }
+      &lt;/div&gt;
+
+      &lt;div class=&quot;mb-3&quot;&gt;
+        &lt;label class=&quot;form-label&quot;&gt;Manufacturing Date&lt;/label&gt;
+        &lt;input type=&quot;date&quot; class=&quot;form-control&quot; formControlName=&quot;manufacturingDate&quot; [class.is-invalid]=&quot;isInvalid('manufacturingDate')&quot; /&gt;
+        @if (isInvalid('manufacturingDate')) { &lt;div class=&quot;invalid-feedback&quot;&gt;Date is required.&lt;/div&gt; }
+      &lt;/div&gt;
+
+      &lt;div class=&quot;mb-3&quot;&gt;
+        &lt;label class=&quot;form-label&quot;&gt;Serial No&lt;/label&gt;
+        &lt;input class=&quot;form-control&quot; formControlName=&quot;serialNo&quot; [class.is-invalid]=&quot;isInvalid('serialNo')&quot; /&gt;
+        @if (isInvalid('serialNo')) { &lt;div class=&quot;invalid-feedback&quot;&gt;Required, max 50 characters.&lt;/div&gt; }
+      &lt;/div&gt;
+
+      &lt;div class=&quot;mb-3&quot;&gt;
+        &lt;label class=&quot;form-label&quot;&gt;Category&lt;/label&gt;
+        &lt;select class=&quot;form-select&quot; formControlName=&quot;categoryId&quot; [class.is-invalid]=&quot;isInvalid('categoryId')&quot;&gt;
+          &lt;option [ngValue]=&quot;0&quot;&gt;-- Select Category --&lt;/option&gt;
+          @for (c of categories(); track c.categoryId) {
+            &lt;option [ngValue]=&quot;c.categoryId&quot;&gt;{{ c.categoryName }}&lt;/option&gt;
+          }
+        &lt;/select&gt;
+        @if (isInvalid('categoryId')) { &lt;div class=&quot;invalid-feedback&quot;&gt;Please select a category.&lt;/div&gt; }
+      &lt;/div&gt;
+
+      &lt;div class=&quot;mb-3&quot;&gt;
+        &lt;label class=&quot;form-label&quot;&gt;Price&lt;/label&gt;
+        &lt;input type=&quot;number&quot; step=&quot;0.01&quot; class=&quot;form-control&quot; formControlName=&quot;price&quot; [class.is-invalid]=&quot;isInvalid('price')&quot; /&gt;
+        @if (isInvalid('price')) { &lt;div class=&quot;invalid-feedback&quot;&gt;Price must be greater than 0.&lt;/div&gt; }
+      &lt;/div&gt;
+
+      &lt;div class=&quot;form-check mb-3&quot;&gt;
+        &lt;input type=&quot;checkbox&quot; id=&quot;isAvailable&quot; class=&quot;form-check-input&quot; formControlName=&quot;isAvailable&quot; /&gt;
+        &lt;label for=&quot;isAvailable&quot; class=&quot;form-check-label&quot;&gt;Is Available&lt;/label&gt;
+      &lt;/div&gt;
+
+      &lt;div class=&quot;mb-3&quot;&gt;
+        &lt;label class=&quot;form-label&quot;&gt;Image&lt;/label&gt;
+        &lt;input type=&quot;file&quot; accept=&quot;image/*&quot; class=&quot;form-control&quot; (change)=&quot;onFileSelected($event)&quot; /&gt;
+        @if (uploading()) { &lt;small class=&quot;text-muted&quot;&gt;Uploading...&lt;/small&gt; }
+        @if (imagePreview()) {
+          &lt;img [src]=&quot;imagePreview()&quot; alt=&quot;Preview&quot; width=&quot;120&quot; class=&quot;img-thumbnail mt-2&quot; /&gt;
+        }
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Right: brands (FormArray) --&gt;
+    &lt;div class=&quot;col-md-5&quot;&gt;
+      &lt;div class=&quot;d-flex justify-content-between align-items-center mb-2&quot;&gt;
+        &lt;h5 class=&quot;mb-0&quot;&gt;Brands&lt;/h5&gt;
+        &lt;button type=&quot;button&quot; class=&quot;btn btn-success btn-sm&quot; (click)=&quot;addBrand()&quot;&gt;+ Add Brand&lt;/button&gt;
+      &lt;/div&gt;
+
+      &lt;table class=&quot;table table-bordered&quot;&gt;
+        &lt;thead&gt;
+          &lt;tr&gt;&lt;th&gt;Brand Name&lt;/th&gt;&lt;th style=&quot;width: 110px&quot;&gt;Stock&lt;/th&gt;&lt;th style=&quot;width: 90px&quot;&gt;&lt;/th&gt;&lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody formArrayName=&quot;brands&quot;&gt;
+          @for (brand of brands.controls; track brand; let i = $index) {
+            &lt;tr [formGroupName]=&quot;i&quot;&gt;
+              &lt;td&gt;
+                &lt;input class=&quot;form-control&quot; formControlName=&quot;brandName&quot; [class.is-invalid]=&quot;isInvalid('brands.' + i + '.brandName')&quot; /&gt;
+              &lt;/td&gt;
+              &lt;td&gt;
+                &lt;input type=&quot;number&quot; class=&quot;form-control&quot; formControlName=&quot;stock&quot; [class.is-invalid]=&quot;isInvalid('brands.' + i + '.stock')&quot; /&gt;
+              &lt;/td&gt;
+              &lt;td&gt;
+                &lt;button type=&quot;button&quot; class=&quot;btn btn-danger btn-sm&quot; (click)=&quot;removeBrand(i)&quot;&gt;Remove&lt;/button&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+          } @empty {
+            &lt;tr&gt;&lt;td colspan=&quot;3&quot; class=&quot;text-center text-muted&quot;&gt;No brands&lt;/td&gt;&lt;/tr&gt;
+          }
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;button type=&quot;submit&quot; class=&quot;btn btn-primary me-2&quot; [disabled]=&quot;saving() || uploading()&quot;&gt;
+    {{ saving() ? 'Saving...' : (isEdit() ? 'Save Changes' : 'Create') }}
+  &lt;/button&gt;
+  &lt;a routerLink=&quot;/products&quot; class=&quot;btn btn-secondary&quot;&gt;Cancel&lt;/a&gt;
+&lt;/form&gt;
+</code></pre>
+<p><strong>Reactive forms, in short:</strong></p>
+<ul>
+<li>The <strong>TypeScript</strong> side owns the form model (<code>fb.group</code>), and the template binds to it with <code>formControlName</code>.</li>
+<li><strong><code>FormArray</code></strong> is the dynamic brand list. Add/remove re-indexes automatically, which solves the problem you hit in MVC.</li>
+<li><strong><code>getRawValue()</code></strong> returns a typed object with exactly the shape of <code>ProductRequest</code>.</li>
+<li><strong><code>[ngValue]</code></strong> keeps the category as a <strong>number</strong> (a plain <code>[value]</code> would give a string).</li>
+</ul>
+<h2 id="213-run-it">2.13 Run it</h2>
+<p>Start the API (F5), then:</p>
+<pre><code class="language-bash">ng serve
+</code></pre>
+<p>Open <code>http://localhost:4200</code>.</p>
+<p><strong>Angular done-checklist:</strong></p>
+<ul>
+<li class="task"><input type="checkbox"> The list loads without logging in.</li>
+<li class="task"><input type="checkbox"> Search, category filter, sort-by-header and paging all work.</li>
+<li class="task"><input type="checkbox"> Register a new user → no Admin buttons appear.</li>
+<li class="task"><input type="checkbox"> Typing <code>/products/new</code> in the address bar redirects back.</li>
+<li class="task"><input type="checkbox"> Logout → login as admin → New Product → validation messages on an empty submit.</li>
+<li class="task"><input type="checkbox"> Upload an image → preview → add/remove brands → Create.</li>
+<li class="task"><input type="checkbox"> Edit is pre-filled → save works.</li>
+<li class="task"><input type="checkbox"> Delete works.</li>
+<li class="task"><input type="checkbox"> <strong>Token refresh test:</strong> temporarily set <code>"AccessTokenMinutes": 1</code> in the API, wait 2 minutes, click Edit. It still works, and the DevTools <strong>Network</strong> tab shows a 401, then <code>refresh</code>, then a successful retry.</li>
+<li class="task"><input type="checkbox"> Commit.</li>
+</ul>
+<hr />
+<h1 id="part-3-react-client">PART 3 — React Client</h1>
+<h2 id="30-modern-react-concepts">3.0 Modern React concepts</h2>
+<p>React is a <strong>library</strong> for building UI from components. Unlike Angular, it doesn't include routing, HTTP or forms, so teams pick a standard set of libraries:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Need</th>
+<th>Angular (built in)</th>
+<th>React (library used here)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Project tooling</td>
+<td>Angular CLI</td>
+<td><strong>Vite</strong></td>
+</tr>
+<tr>
+<td>Component state</td>
+<td>Signals</td>
+<td><strong><code>useState</code></strong></td>
+</tr>
+<tr>
+<td>Server data (fetch, cache, refetch)</td>
+<td>Services + signals</td>
+<td><strong>TanStack Query</strong></td>
+</tr>
+<tr>
+<td>Shared app state (logged-in user)</td>
+<td><code>AuthService</code> (root singleton)</td>
+<td><strong>Context</strong> (<code>AuthProvider</code> + <code>useAuth</code>)</td>
+</tr>
+<tr>
+<td>HTTP + interceptors</td>
+<td><code>HttpClient</code> + <code>HttpInterceptorFn</code></td>
+<td><strong>Axios</strong> + axios interceptors</td>
+</tr>
+<tr>
+<td>Routing + guards</td>
+<td>Router + <code>CanActivateFn</code></td>
+<td><strong>React Router</strong> + a <code>&lt;RequireAdmin&gt;</code> wrapper component</td>
+</tr>
+<tr>
+<td>Forms + validation</td>
+<td>Reactive Forms + Validators</td>
+<td><strong>React Hook Form + Zod</strong></td>
+</tr>
+<tr>
+<td>Dynamic rows</td>
+<td><code>FormArray</code></td>
+<td><strong><code>useFieldArray</code></strong></td>
+</tr>
+<tr>
+<td>Lazy loading</td>
+<td><code>loadComponent</code></td>
+<td><strong><code>lazy()</code> + <code>&lt;Suspense&gt;</code></strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>The core ideas:</strong></p>
+<ol>
+<li><strong>A component is a function that returns JSX</strong> (HTML-like syntax inside TypeScript).</li>
+<li><strong>Props</strong> go in, <strong>state</strong> lives inside. When state changes, React re-runs the function and updates the screen.</li>
+<li><strong>Hooks</strong> (<code>useState</code>, <code>useQuery</code>, <code>useForm</code>, …) give components abilities. Call them only at the <strong>top level</strong> of a component, never inside <code>if</code> statements or loops.</li>
+<li><strong>Server state</strong> (data from the API) is <em>not</em> stored in <code>useState</code>. TanStack Query owns it: caching, loading/error flags, refetching after changes.</li>
+<li><strong>Data flows down</strong> (parent → child through props). <strong>Events flow up</strong> (the child calls a function the parent passed in, like <code>onSubmit</code>).</li>
+</ol>
+<p><strong>Data flow in this React app:</strong></p>
+<pre><code>Page component
+  │ uses
+Hook (useProducts, useCreateProduct)      ← TanStack Query: cache + loading/error state
+  │ calls
+API function (productApi.getPaged)
+  │ uses
+axios instance &quot;api&quot;
+  │ passes through
+interceptors (request: add Bearer token / response: on 401 → refresh → retry)
+  │
+.NET API
+</code></pre>
+<h2 id="31-create-the-project">3.1 Create the project</h2>
+<p>Install <strong>Node.js LTS</strong> (22+), then:</p>
+<pre><code class="language-bash">cd ProductHub
+npm create vite@latest product-react -- --template react-ts
+cd product-react
+npm install
+npm install react-router @tanstack/react-query axios react-hook-form zod @hookform/resolvers bootstrap
+</code></pre>
+<p>If the Vite wizard asks extra questions, choose the defaults (or "No" for anything experimental).</p>
+<p>Then clean up the template:</p>
+<ul>
+<li>Delete <code>src/App.css</code>, <code>src/index.css</code> and the <code>src/assets</code> folder.</li>
+</ul>
+<p>Create <code>.env</code> in the project root:</p>
+<pre><code>VITE_API_URL=https://localhost:7001
+</code></pre>
+<ul>
+<li>Only <code>VITE_</code>-prefixed variables reach your code.</li>
+<li><strong>Never put secrets in a front-end <code>.env</code>.</strong> Everything in the browser is public.</li>
+<li>Restart <code>npm run dev</code> after any change to <code>.env</code>.</li>
+</ul>
+<h2 id="32-folder-structure">3.2 Folder structure</h2>
+<pre><code>src/
+├─ api/
+│  ├─ tokenStorage.ts     read/write tokens in localStorage
+│  ├─ client.ts           axios instance + interceptors (token + refresh)
+│  ├─ authApi.ts
+│  └─ productApi.ts
+├─ auth/
+│  ├─ AuthContext.ts      context object + useAuth() hook
+│  ├─ AuthProvider.tsx    holds the logged-in user
+│  └─ RequireAdmin.tsx    route guard component
+├─ hooks/
+│  └─ useProducts.ts      TanStack Query hooks
+├─ types/
+│  ├─ auth.ts
+│  └─ product.ts
+├─ utils/
+│  └─ errorMessage.ts
+├─ components/
+│  ├─ Navbar.tsx
+│  └─ ProductForm.tsx     shared by create + edit
+├─ pages/
+│  ├─ LoginPage.tsx  RegisterPage.tsx
+│  ├─ ProductListPage.tsx
+│  └─ ProductCreatePage.tsx  ProductEditPage.tsx
+├─ App.tsx                routes
+└─ main.tsx               providers
+</code></pre>
+<h2 id="33-types">3.3 Types</h2>
+<p><strong>src/types/auth.ts</strong></p>
+<pre><code class="language-ts">export interface User {
+  id: string;
+  email: string;
+  fullName: string;
+  roles: string[];
+}
+
+export interface AuthResponse {
+  accessToken: string;
+  accessTokenExpiresAt: string;
+  refreshToken: string;
+  refreshTokenExpiresAt: string;
+  user: User;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  fullName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+</code></pre>
+<p><strong>src/types/product.ts</strong></p>
+<pre><code class="language-ts">export interface Brand {
+  brandId?: number;
+  brandName: string;
+  stock: number;
+}
+
+export interface Product {
+  productId: number;
+  productName: string;
+  manufacturingDate: string;
+  serialNo: string;
+  imageFileName: string;
+  imageUrl: string;
+  isAvailable: boolean;
+  categoryId: number;
+  categoryName: string;
+  price: number;
+  totalStock: number;
+  brands: Brand[];
+}
+
+export interface ProductRequest {
+  productName: string;
+  manufacturingDate: string;
+  serialNo: string;
+  imageFileName: string | null;
+  isAvailable: boolean;
+  categoryId: number;
+  price: number;
+  brands: { brandName: string; stock: number }[];
+}
+
+export interface Category {
+  categoryId: number;
+  categoryName: string;
+}
+
+export interface PagedResult&lt;T&gt; {
+  items: T[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+  hasPrevious: boolean;
+  hasNext: boolean;
+}
+
+export interface ProductQuery {
+  search?: string;
+  categoryId?: number | null;
+  sortBy?: string;
+  sortDir?: &quot;asc&quot; | &quot;desc&quot;;
+  page: number;
+  pageSize: number;
+}
+
+export interface UploadResponse {
+  fileName: string;
+  url: string;
+}
+</code></pre>
+<p>These are the same shapes as in Angular. Both clients follow the API's DTO contract.</p>
+<h2 id="34-api-layer">3.4 API layer</h2>
+<p><strong>src/api/tokenStorage.ts</strong></p>
+<pre><code class="language-ts">import type { AuthResponse } from &quot;../types/auth&quot;;
+
+const KEY = &quot;auth&quot;;
+
+export const tokenStorage = {
+  get(): AuthResponse | null {
+    const raw = localStorage.getItem(KEY);
+    return raw ? (JSON.parse(raw) as AuthResponse) : null;
+  },
+  set(auth: AuthResponse) {
+    localStorage.setItem(KEY, JSON.stringify(auth));
+  },
+  clear() {
+    localStorage.removeItem(KEY);
+  },
+};
+</code></pre>
+<p><strong>src/api/client.ts</strong></p>
+<pre><code class="language-ts">import axios from &quot;axios&quot;;
+import type { AxiosError, InternalAxiosRequestConfig } from &quot;axios&quot;;
+import { tokenStorage } from &quot;./tokenStorage&quot;;
+import type { AuthResponse } from &quot;../types/auth&quot;;
+
+export const API_URL = import.meta.env.VITE_API_URL;
+
+export const api = axios.create({ baseURL: `${API_URL}/api` });
+
+// ---- Request interceptor: attach the access token ----
+api.interceptors.request.use((config) =&gt; {
+  const token = tokenStorage.get()?.accessToken;
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+// ---- Response interceptor: on 401, refresh once and retry ----
+let refreshPromise: Promise&lt;string&gt; | null = null;   // shared, so parallel 401s cause ONE refresh
+const AUTH_ENDPOINTS = [&quot;/auth/login&quot;, &quot;/auth/register&quot;, &quot;/auth/refresh&quot;];
+
+async function refreshAccessToken(): Promise&lt;string&gt; {
+  const refreshToken = tokenStorage.get()?.refreshToken;
+  if (!refreshToken) throw new Error(&quot;No refresh token&quot;);
+  // Plain axios (not `api`), so this call skips our interceptors
+  const { data } = await axios.post&lt;AuthResponse&gt;(`${API_URL}/api/auth/refresh`, { refreshToken });
+  tokenStorage.set(data);
+  return data.accessToken;
+}
+
+api.interceptors.response.use(
+  (response) =&gt; response,
+  async (error: AxiosError) =&gt; {
+    const original = error.config as (InternalAxiosRequestConfig &amp; { _retry?: boolean }) | undefined;
+    const isAuthEndpoint = AUTH_ENDPOINTS.some((url) =&gt; original?.url?.includes(url));
+
+    if (error.response?.status !== 401 || !original || original._retry || isAuthEndpoint || !tokenStorage.get()) {
+      return Promise.reject(error);
+    }
+
+    original._retry = true;   // never retry the same request twice
+    try {
+      refreshPromise ??= refreshAccessToken().finally(() =&gt; {
+        refreshPromise = null;
+      });
+      const newToken = await refreshPromise;
+      original.headers.Authorization = `Bearer ${newToken}`;
+      return api(original);
+    } catch (refreshError) {
+      tokenStorage.clear();            // session over
+      window.location.href = &quot;/login&quot;;
+      return Promise.reject(refreshError);
+    }
+  }
+);
+</code></pre>
+<p><strong>src/api/authApi.ts</strong></p>
+<pre><code class="language-ts">import { api } from &quot;./client&quot;;
+import type { AuthResponse, LoginRequest, RegisterRequest } from &quot;../types/auth&quot;;
+
+export const authApi = {
+  login: async (request: LoginRequest) =&gt; (await api.post&lt;AuthResponse&gt;(&quot;/auth/login&quot;, request)).data,
+  register: async (request: RegisterRequest) =&gt; (await api.post&lt;AuthResponse&gt;(&quot;/auth/register&quot;, request)).data,
+  logout: async (refreshToken: string) =&gt; {
+    await api.post(&quot;/auth/logout&quot;, { refreshToken });
+  },
+};
+</code></pre>
+<p><strong>src/api/productApi.ts</strong></p>
+<pre><code class="language-ts">import { api } from &quot;./client&quot;;
+import type { Category, PagedResult, Product, ProductQuery, ProductRequest, UploadResponse } from &quot;../types/product&quot;;
+
+export const productApi = {
+  getCategories: async () =&gt; (await api.get&lt;Category[]&gt;(&quot;/categories&quot;)).data,
+
+  // axios turns the object into ?page=1&amp;pageSize=5&amp;search=... (null/undefined values are skipped)
+  getPaged: async (query: ProductQuery) =&gt; (await api.get&lt;PagedResult&lt;Product&gt;&gt;(&quot;/products&quot;, { params: query })).data,
+
+  getById: async (id: number) =&gt; (await api.get&lt;Product&gt;(`/products/${id}`)).data,
+
+  create: async (product: ProductRequest) =&gt; (await api.post&lt;Product&gt;(&quot;/products&quot;, product)).data,
+
+  update: async (id: number, product: ProductRequest) =&gt; (await api.put&lt;Product&gt;(`/products/${id}`, product)).data,
+
+  remove: async (id: number) =&gt; {
+    await api.delete(`/products/${id}`);
+  },
+
+  uploadImage: async (file: File) =&gt; {
+    const formData = new FormData();
+    formData.append(&quot;file&quot;, file);
+    return (await api.post&lt;UploadResponse&gt;(&quot;/products/upload&quot;, formData)).data;
+  },
+};
+</code></pre>
+<p><strong>src/utils/errorMessage.ts</strong></p>
+<pre><code class="language-ts">import axios from &quot;axios&quot;;
+
+export function getErrorMessage(error: unknown): string {
+  if (axios.isAxiosError(error)) {
+    if (!error.response) return &quot;Cannot reach the server. Is the API running?&quot;;
+    const data = error.response.data;
+    if (data?.errors) return Object.values(data.errors).flat().join(&quot; &quot;);
+    if (data?.detail) return data.detail;
+    if (data?.title) return data.title;
+    return error.message;
+  }
+  return &quot;Something went wrong.&quot;;
+}
+</code></pre>
+<p><strong>Why <code>import type</code>?</strong> The Vite TypeScript config (<code>verbatimModuleSyntax</code>) requires imports used only as types to be marked <code>import type</code>.</p>
+<h2 id="35-auth-state-with-context">3.5 Auth state with Context</h2>
+<p><strong>src/auth/AuthContext.ts</strong></p>
+<pre><code class="language-ts">import { createContext, useContext } from &quot;react&quot;;
+import type { LoginRequest, RegisterRequest, User } from &quot;../types/auth&quot;;
+
+export interface AuthContextValue {
+  user: User | null;
+  isAdmin: boolean;
+  login: (request: LoginRequest) =&gt; Promise&lt;void&gt;;
+  register: (request: RegisterRequest) =&gt; Promise&lt;void&gt;;
+  logout: () =&gt; Promise&lt;void&gt;;
+}
+
+export const AuthContext = createContext&lt;AuthContextValue | null&gt;(null);
+
+// Any component can call useAuth() to read the user or call login/logout
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error(&quot;useAuth must be used inside &lt;AuthProvider&gt;&quot;);
+  return context;
+}
+</code></pre>
+<p><strong>src/auth/AuthProvider.tsx</strong></p>
+<pre><code class="language-tsx">import { useState } from &quot;react&quot;;
+import type { ReactNode } from &quot;react&quot;;
+import { AuthContext } from &quot;./AuthContext&quot;;
+import { authApi } from &quot;../api/authApi&quot;;
+import { tokenStorage } from &quot;../api/tokenStorage&quot;;
+import type { LoginRequest, RegisterRequest, User } from &quot;../types/auth&quot;;
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  // Lazy initial state: read localStorage once, on first render
+  const [user, setUser] = useState&lt;User | null&gt;(() =&gt; tokenStorage.get()?.user ?? null);
+
+  async function login(request: LoginRequest) {
+    const data = await authApi.login(request);
+    tokenStorage.set(data);
+    setUser(data.user);
+  }
+
+  async function register(request: RegisterRequest) {
+    const data = await authApi.register(request);
+    tokenStorage.set(data);
+    setUser(data.user);
+  }
+
+  async function logout() {
+    const refreshToken = tokenStorage.get()?.refreshToken;
+    try {
+      if (refreshToken) await authApi.logout(refreshToken);
+    } catch {
+      // ignore: we log out locally anyway
+    } finally {
+      tokenStorage.clear();
+      setUser(null);
+    }
+  }
+
+  const isAdmin = user?.roles.includes(&quot;Admin&quot;) ?? false;
+
+  return &lt;AuthContext value={{ user, isAdmin, login, register, logout }}&gt;{children}&lt;/AuthContext&gt;;
+}
+</code></pre>
+<p>In React 19, <code>&lt;AuthContext value={...}&gt;</code> works directly as the provider. In React 18 you'd write <code>&lt;AuthContext.Provider value={...}&gt;</code>.</p>
+<p><strong>src/auth/RequireAdmin.tsx</strong></p>
+<pre><code class="language-tsx">import type { ReactNode } from &quot;react&quot;;
+import { Navigate, useLocation } from &quot;react-router&quot;;
+import { useAuth } from &quot;./AuthContext&quot;;
+
+export function RequireAdmin({ children }: { children: ReactNode }) {
+  const { user, isAdmin } = useAuth();
+  const location = useLocation();
+
+  if (!user) return &lt;Navigate to=&quot;/login&quot; replace state={{ from: location.pathname }} /&gt;;
+  if (!isAdmin) return &lt;Navigate to=&quot;/products&quot; replace /&gt;;
+  return children;
+}
+</code></pre>
+<p>As in Angular, this guard is <strong>only UX</strong>. The API's <code>[Authorize(Roles = "Admin")]</code> is the real protection.</p>
+<h2 id="36-data-hooks-tanstack-query">3.6 Data hooks (TanStack Query)</h2>
+<p><strong>src/hooks/useProducts.ts</strong></p>
+<pre><code class="language-ts">import { keepPreviousData, useMutation, useQuery, useQueryClient } from &quot;@tanstack/react-query&quot;;
+import { productApi } from &quot;../api/productApi&quot;;
+import type { ProductQuery, ProductRequest } from &quot;../types/product&quot;;
+
+export function useCategories() {
+  return useQuery({
+    queryKey: [&quot;categories&quot;],
+    queryFn: productApi.getCategories,
+    staleTime: 5 * 60 * 1000,   // categories rarely change: treat as fresh for 5 minutes
+  });
+}
+
+export function useProducts(query: ProductQuery) {
+  return useQuery({
+    queryKey: [&quot;products&quot;, &quot;list&quot;, query],   // a new query object = a new cache entry
+    queryFn: () =&gt; productApi.getPaged(query),
+    placeholderData: keepPreviousData,       // keep showing the old page while the next one loads
+  });
+}
+
+export function useProduct(id: number) {
+  return useQuery({
+    queryKey: [&quot;products&quot;, &quot;detail&quot;, id],
+    queryFn: () =&gt; productApi.getById(id),
+  });
+}
+
+export function useCreateProduct() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: productApi.create,
+    onSuccess: () =&gt; queryClient.invalidateQueries({ queryKey: [&quot;products&quot;] }),
+  });
+}
+
+export function useUpdateProduct() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, product }: { id: number; product: ProductRequest }) =&gt; productApi.update(id, product),
+    onSuccess: () =&gt; queryClient.invalidateQueries({ queryKey: [&quot;products&quot;] }),
+  });
+}
+
+export function useDeleteProduct() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: productApi.remove,
+    onSuccess: () =&gt; queryClient.invalidateQueries({ queryKey: [&quot;products&quot;] }),
+  });
+}
+</code></pre>
+<p><strong>Query keys are the cache's addresses.</strong> <code>["products"]</code> is a prefix of every product key, so invalidating it refreshes all product lists and details after any change.</p>
+<h2 id="37-components">3.7 Components</h2>
+<p><strong>src/components/Navbar.tsx</strong></p>
+<pre><code class="language-tsx">import { Link, NavLink, useNavigate } from &quot;react-router&quot;;
+import { useAuth } from &quot;../auth/AuthContext&quot;;
+
+export default function Navbar() {
+  const { user, isAdmin, logout } = useAuth();
+  const navigate = useNavigate();
+
+  async function handleLogout() {
+    await logout();
+    navigate(&quot;/login&quot;);
+  }
+
+  return (
+    &lt;nav className=&quot;navbar navbar-expand navbar-dark bg-dark mb-4&quot;&gt;
+      &lt;div className=&quot;container&quot;&gt;
+        &lt;Link to=&quot;/products&quot; className=&quot;navbar-brand&quot;&gt;ProductHub&lt;/Link&gt;
+
+        &lt;ul className=&quot;navbar-nav me-auto&quot;&gt;
+          &lt;li className=&quot;nav-item&quot;&gt;&lt;NavLink to=&quot;/products&quot; end className=&quot;nav-link&quot;&gt;Products&lt;/NavLink&gt;&lt;/li&gt;
+          {isAdmin &amp;&amp; (
+            &lt;li className=&quot;nav-item&quot;&gt;&lt;NavLink to=&quot;/products/new&quot; className=&quot;nav-link&quot;&gt;New Product&lt;/NavLink&gt;&lt;/li&gt;
+          )}
+        &lt;/ul&gt;
+
+        {user ? (
+          &lt;&gt;
+            &lt;span className=&quot;navbar-text me-3&quot;&gt;
+              Hi, {user.fullName} {isAdmin &amp;&amp; &lt;span className=&quot;badge bg-warning text-dark&quot;&gt;Admin&lt;/span&gt;}
+            &lt;/span&gt;
+            &lt;button className=&quot;btn btn-outline-light btn-sm&quot; onClick={handleLogout}&gt;Logout&lt;/button&gt;
+          &lt;/&gt;
+        ) : (
+          &lt;&gt;
+            &lt;Link to=&quot;/login&quot; className=&quot;btn btn-outline-light btn-sm me-2&quot;&gt;Login&lt;/Link&gt;
+            &lt;Link to=&quot;/register&quot; className=&quot;btn btn-light btn-sm&quot;&gt;Register&lt;/Link&gt;
+          &lt;/&gt;
+        )}
+      &lt;/div&gt;
+    &lt;/nav&gt;
+  );
+}
+</code></pre>
+<p><code>NavLink</code> automatically adds the <code>active</code> CSS class when its URL matches the current page.</p>
+<p><strong>src/components/ProductForm.tsx</strong></p>
+<pre><code class="language-tsx">import { useState } from &quot;react&quot;;
+import type { ChangeEvent } from &quot;react&quot;;
+import { useFieldArray, useForm } from &quot;react-hook-form&quot;;
+import { zodResolver } from &quot;@hookform/resolvers/zod&quot;;
+import { z } from &quot;zod&quot;;
+import { Link } from &quot;react-router&quot;;
+import { useCategories } from &quot;../hooks/useProducts&quot;;
+import { productApi } from &quot;../api/productApi&quot;;
+import { getErrorMessage } from &quot;../utils/errorMessage&quot;;
+
+// Same rules as the API's Data Annotations
+const productSchema = z.object({
+  productName: z.string().trim().min(1, &quot;Product name is required&quot;).max(100, &quot;Max 100 characters&quot;),
+  manufacturingDate: z.string().min(1, &quot;Manufacturing date is required&quot;),
+  serialNo: z.string().trim().min(1, &quot;Serial no is required&quot;).max(50, &quot;Max 50 characters&quot;),
+  imageFileName: z.string().nullable(),
+  isAvailable: z.boolean(),
+  categoryId: z.number({ error: &quot;Please select a category&quot; }).min(1, &quot;Please select a category&quot;),
+  price: z.number({ error: &quot;Price is required&quot; }).positive(&quot;Price must be greater than 0&quot;),
+  brands: z.array(
+    z.object({
+      brandName: z.string().trim().min(1, &quot;Brand name is required&quot;).max(100),
+      stock: z.number({ error: &quot;Stock is required&quot; }).int().min(0, &quot;Stock cannot be negative&quot;),
+    })
+  ),
+});
+
+export type ProductFormValues = z.infer&lt;typeof productSchema&gt;;
+
+const emptyProduct: ProductFormValues = {
+  productName: &quot;&quot;,
+  manufacturingDate: new Date().toISOString().slice(0, 10),
+  serialNo: &quot;&quot;,
+  imageFileName: null,
+  isAvailable: true,
+  categoryId: 0,
+  price: 0,
+  brands: [{ brandName: &quot;&quot;, stock: 0 }],
+};
+
+interface ProductFormProps {
+  defaultValues?: ProductFormValues;
+  initialImageUrl?: string;
+  onSubmit: (values: ProductFormValues) =&gt; void;
+  isSubmitting: boolean;
+  submitText: string;
+}
+
+export default function ProductForm({ defaultValues, initialImageUrl, onSubmit, isSubmitting, submitText }: ProductFormProps) {
+  const { data: categories = [] } = useCategories();
+  const [preview, setPreview] = useState&lt;string | undefined&gt;(initialImageUrl);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState(&quot;&quot;);
+
+  const {
+    register,
+    control,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm&lt;ProductFormValues&gt;({
+    resolver: zodResolver(productSchema),
+    defaultValues: defaultValues ?? emptyProduct,
+  });
+
+  const { fields, append, remove } = useFieldArray({ control, name: &quot;brands&quot; });
+
+  // Step 1: upload the image as soon as it's chosen
+  async function handleFileChange(e: ChangeEvent&lt;HTMLInputElement&gt;) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setUploadError(&quot;&quot;);
+    try {
+      const result = await productApi.uploadImage(file);
+      setValue(&quot;imageFileName&quot;, result.fileName);   // Step 2: the JSON save carries the file name
+      setPreview(result.url);
+    } catch (err) {
+      setUploadError(getErrorMessage(err));
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    &lt;form onSubmit={handleSubmit(onSubmit)} noValidate&gt;
+      &lt;div className=&quot;row&quot;&gt;
+        {/* Left: product fields */}
+        &lt;div className=&quot;col-md-7&quot;&gt;
+          &lt;div className=&quot;mb-3&quot;&gt;
+            &lt;label className=&quot;form-label&quot;&gt;Product Name&lt;/label&gt;
+            &lt;input className={`form-control ${errors.productName ? &quot;is-invalid&quot; : &quot;&quot;}`} {...register(&quot;productName&quot;)} /&gt;
+            &lt;div className=&quot;invalid-feedback&quot;&gt;{errors.productName?.message}&lt;/div&gt;
+          &lt;/div&gt;
+
+          &lt;div className=&quot;mb-3&quot;&gt;
+            &lt;label className=&quot;form-label&quot;&gt;Manufacturing Date&lt;/label&gt;
+            &lt;input type=&quot;date&quot; className={`form-control ${errors.manufacturingDate ? &quot;is-invalid&quot; : &quot;&quot;}`} {...register(&quot;manufacturingDate&quot;)} /&gt;
+            &lt;div className=&quot;invalid-feedback&quot;&gt;{errors.manufacturingDate?.message}&lt;/div&gt;
+          &lt;/div&gt;
+
+          &lt;div className=&quot;mb-3&quot;&gt;
+            &lt;label className=&quot;form-label&quot;&gt;Serial No&lt;/label&gt;
+            &lt;input className={`form-control ${errors.serialNo ? &quot;is-invalid&quot; : &quot;&quot;}`} {...register(&quot;serialNo&quot;)} /&gt;
+            &lt;div className=&quot;invalid-feedback&quot;&gt;{errors.serialNo?.message}&lt;/div&gt;
+          &lt;/div&gt;
+
+          &lt;div className=&quot;mb-3&quot;&gt;
+            &lt;label className=&quot;form-label&quot;&gt;Category&lt;/label&gt;
+            &lt;select className={`form-select ${errors.categoryId ? &quot;is-invalid&quot; : &quot;&quot;}`} {...register(&quot;categoryId&quot;, { valueAsNumber: true })}&gt;
+              &lt;option value={0}&gt;-- Select Category --&lt;/option&gt;
+              {categories.map((c) =&gt; (
+                &lt;option key={c.categoryId} value={c.categoryId}&gt;{c.categoryName}&lt;/option&gt;
+              ))}
+            &lt;/select&gt;
+            &lt;div className=&quot;invalid-feedback&quot;&gt;{errors.categoryId?.message}&lt;/div&gt;
+          &lt;/div&gt;
+
+          &lt;div className=&quot;mb-3&quot;&gt;
+            &lt;label className=&quot;form-label&quot;&gt;Price&lt;/label&gt;
+            &lt;input type=&quot;number&quot; step=&quot;0.01&quot; className={`form-control ${errors.price ? &quot;is-invalid&quot; : &quot;&quot;}`} {...register(&quot;price&quot;, { valueAsNumber: true })} /&gt;
+            &lt;div className=&quot;invalid-feedback&quot;&gt;{errors.price?.message}&lt;/div&gt;
+          &lt;/div&gt;
+
+          &lt;div className=&quot;form-check mb-3&quot;&gt;
+            &lt;input type=&quot;checkbox&quot; id=&quot;isAvailable&quot; className=&quot;form-check-input&quot; {...register(&quot;isAvailable&quot;)} /&gt;
+            &lt;label htmlFor=&quot;isAvailable&quot; className=&quot;form-check-label&quot;&gt;Is Available&lt;/label&gt;
+          &lt;/div&gt;
+
+          &lt;div className=&quot;mb-3&quot;&gt;
+            &lt;label className=&quot;form-label&quot;&gt;Image&lt;/label&gt;
+            &lt;input type=&quot;file&quot; accept=&quot;image/*&quot; className=&quot;form-control&quot; onChange={handleFileChange} /&gt;
+            {uploading &amp;&amp; &lt;small className=&quot;text-muted&quot;&gt;Uploading...&lt;/small&gt;}
+            {uploadError &amp;&amp; &lt;small className=&quot;text-danger d-block&quot;&gt;{uploadError}&lt;/small&gt;}
+            {preview &amp;&amp; &lt;img src={preview} alt=&quot;Preview&quot; width={120} className=&quot;img-thumbnail mt-2&quot; /&gt;}
+          &lt;/div&gt;
+        &lt;/div&gt;
+
+        {/* Right: brands */}
+        &lt;div className=&quot;col-md-5&quot;&gt;
+          &lt;div className=&quot;d-flex justify-content-between align-items-center mb-2&quot;&gt;
+            &lt;h5 className=&quot;mb-0&quot;&gt;Brands&lt;/h5&gt;
+            &lt;button type=&quot;button&quot; className=&quot;btn btn-success btn-sm&quot; onClick={() =&gt; append({ brandName: &quot;&quot;, stock: 0 })}&gt;
+              + Add Brand
+            &lt;/button&gt;
+          &lt;/div&gt;
+
+          &lt;table className=&quot;table table-bordered&quot;&gt;
+            &lt;thead&gt;
+              &lt;tr&gt;&lt;th&gt;Brand Name&lt;/th&gt;&lt;th style={{ width: 110 }}&gt;Stock&lt;/th&gt;&lt;th style={{ width: 90 }}&gt;&lt;/th&gt;&lt;/tr&gt;
+            &lt;/thead&gt;
+            &lt;tbody&gt;
+              {fields.map((field, index) =&gt; (
+                &lt;tr key={field.id}&gt;
+                  &lt;td&gt;
+                    &lt;input className={`form-control ${errors.brands?.[index]?.brandName ? &quot;is-invalid&quot; : &quot;&quot;}`} {...register(`brands.${index}.brandName`)} /&gt;
+                    &lt;div className=&quot;invalid-feedback&quot;&gt;{errors.brands?.[index]?.brandName?.message}&lt;/div&gt;
+                  &lt;/td&gt;
+                  &lt;td&gt;
+                    &lt;input type=&quot;number&quot; className={`form-control ${errors.brands?.[index]?.stock ? &quot;is-invalid&quot; : &quot;&quot;}`} {...register(`brands.${index}.stock`, { valueAsNumber: true })} /&gt;
+                    &lt;div className=&quot;invalid-feedback&quot;&gt;{errors.brands?.[index]?.stock?.message}&lt;/div&gt;
+                  &lt;/td&gt;
+                  &lt;td&gt;
+                    &lt;button type=&quot;button&quot; className=&quot;btn btn-danger btn-sm&quot; onClick={() =&gt; remove(index)}&gt;Remove&lt;/button&gt;
+                  &lt;/td&gt;
+                &lt;/tr&gt;
+              ))}
+              {fields.length === 0 &amp;&amp; (
+                &lt;tr&gt;&lt;td colSpan={3} className=&quot;text-center text-muted&quot;&gt;No brands&lt;/td&gt;&lt;/tr&gt;
+              )}
+            &lt;/tbody&gt;
+          &lt;/table&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;button type=&quot;submit&quot; className=&quot;btn btn-primary me-2&quot; disabled={isSubmitting || uploading}&gt;
+        {isSubmitting ? &quot;Saving...&quot; : submitText}
+      &lt;/button&gt;
+      &lt;Link to=&quot;/products&quot; className=&quot;btn btn-secondary&quot;&gt;Cancel&lt;/Link&gt;
+    &lt;/form&gt;
+  );
+}
+</code></pre>
+<p><strong>How this form works:</strong></p>
+<ul>
+<li><strong><code>{...register("productName")}</code></strong> connects the input to the form (<code>name</code>, <code>onChange</code>, <code>onBlur</code>, <code>ref</code>).</li>
+<li><strong><code>valueAsNumber</code></strong> sends numbers, not strings.</li>
+<li><strong><code>handleSubmit(onSubmit)</code></strong> validates with Zod first, then calls <code>onSubmit</code> only if the data is valid.</li>
+<li><strong><code>key={field.id}</code>:</strong> React needs stable keys in lists. Use <code>field.id</code>, never the index.</li>
+</ul>
+<h2 id="38-pages">3.8 Pages</h2>
+<p><strong>src/pages/LoginPage.tsx</strong></p>
+<pre><code class="language-tsx">import { useState } from &quot;react&quot;;
+import { useForm } from &quot;react-hook-form&quot;;
+import { zodResolver } from &quot;@hookform/resolvers/zod&quot;;
+import { z } from &quot;zod&quot;;
+import { Link, useLocation, useNavigate } from &quot;react-router&quot;;
+import { useAuth } from &quot;../auth/AuthContext&quot;;
+import { getErrorMessage } from &quot;../utils/errorMessage&quot;;
+
+const loginSchema = z.object({
+  email: z.email(&quot;Enter a valid email&quot;),
+  password: z.string().min(1, &quot;Password is required&quot;),
+});
+type LoginValues = z.infer&lt;typeof loginSchema&gt;;
+
+export default function LoginPage() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [serverError, setServerError] = useState(&quot;&quot;);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm&lt;LoginValues&gt;({ resolver: zodResolver(loginSchema), defaultValues: { email: &quot;&quot;, password: &quot;&quot; } });
+
+  async function onSubmit(values: LoginValues) {
+    setServerError(&quot;&quot;);
+    try {
+      await login(values);
+      const from = (location.state as { from?: string } | null)?.from ?? &quot;/products&quot;;
+      navigate(from, { replace: true });
+    } catch (err) {
+      setServerError(getErrorMessage(err));
+    }
+  }
+
+  return (
+    &lt;div className=&quot;row justify-content-center&quot;&gt;
+      &lt;div className=&quot;col-md-5&quot;&gt;
+        &lt;h3 className=&quot;mb-3&quot;&gt;Login&lt;/h3&gt;
+        {serverError &amp;&amp; &lt;div className=&quot;alert alert-danger&quot;&gt;{serverError}&lt;/div&gt;}
+
+        &lt;form onSubmit={handleSubmit(onSubmit)} noValidate&gt;
+          &lt;div className=&quot;mb-3&quot;&gt;
+            &lt;label className=&quot;form-label&quot;&gt;Email&lt;/label&gt;
+            &lt;input type=&quot;email&quot; className={`form-control ${errors.email ? &quot;is-invalid&quot; : &quot;&quot;}`} {...register(&quot;email&quot;)} /&gt;
+            &lt;div className=&quot;invalid-feedback&quot;&gt;{errors.email?.message}&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div className=&quot;mb-3&quot;&gt;
+            &lt;label className=&quot;form-label&quot;&gt;Password&lt;/label&gt;
+            &lt;input type=&quot;password&quot; className={`form-control ${errors.password ? &quot;is-invalid&quot; : &quot;&quot;}`} {...register(&quot;password&quot;)} /&gt;
+            &lt;div className=&quot;invalid-feedback&quot;&gt;{errors.password?.message}&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;button className=&quot;btn btn-primary w-100&quot; disabled={isSubmitting}&gt;
+            {isSubmitting ? &quot;Signing in...&quot; : &quot;Login&quot;}
+          &lt;/button&gt;
+        &lt;/form&gt;
+
+        &lt;p className=&quot;mt-3&quot;&gt;No account? &lt;Link to=&quot;/register&quot;&gt;Register&lt;/Link&gt;&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}
+</code></pre>
+<p><strong>src/pages/RegisterPage.tsx</strong></p>
+<pre><code class="language-tsx">import { useState } from &quot;react&quot;;
+import { useForm } from &quot;react-hook-form&quot;;
+import { zodResolver } from &quot;@hookform/resolvers/zod&quot;;
+import { z } from &quot;zod&quot;;
+import { Link, useNavigate } from &quot;react-router&quot;;
+import { useAuth } from &quot;../auth/AuthContext&quot;;
+import { getErrorMessage } from &quot;../utils/errorMessage&quot;;
+
+const registerSchema = z
+  .object({
+    fullName: z.string().trim().min(1, &quot;Full name is required&quot;).max(100),
+    email: z.email(&quot;Enter a valid email&quot;),
+    password: z
+      .string()
+      .min(8, &quot;At least 8 characters&quot;)
+      .regex(/[a-z]/, &quot;Needs a lowercase letter&quot;)
+      .regex(/[A-Z]/, &quot;Needs an uppercase letter&quot;)
+      .regex(/\d/, &quot;Needs a digit&quot;)
+      .regex(/[^a-zA-Z\d]/, &quot;Needs a symbol&quot;),
+    confirmPassword: z.string(),
+  })
+  .refine((data) =&gt; data.password === data.confirmPassword, {
+    error: &quot;Passwords do not match&quot;,
+    path: [&quot;confirmPassword&quot;],
+  });
+type RegisterValues = z.infer&lt;typeof registerSchema&gt;;
+
+export default function RegisterPage() {
+  const { register: registerUser } = useAuth();   // renamed: RHF also has &quot;register&quot;
+  const navigate = useNavigate();
+  const [serverError, setServerError] = useState(&quot;&quot;);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm&lt;RegisterValues&gt;({
+    resolver: zodResolver(registerSchema),
+    defaultValues: { fullName: &quot;&quot;, email: &quot;&quot;, password: &quot;&quot;, confirmPassword: &quot;&quot; },
+  });
+
+  async function onSubmit(values: RegisterValues) {
+    setServerError(&quot;&quot;);
+    try {
+      await registerUser(values);
+      navigate(&quot;/products&quot;, { replace: true });
+    } catch (err) {
+      setServerError(getErrorMessage(err));
+    }
+  }
+
+  return (
+    &lt;div className=&quot;row justify-content-center&quot;&gt;
+      &lt;div className=&quot;col-md-5&quot;&gt;
+        &lt;h3 className=&quot;mb-3&quot;&gt;Create an account&lt;/h3&gt;
+        {serverError &amp;&amp; &lt;div className=&quot;alert alert-danger&quot;&gt;{serverError}&lt;/div&gt;}
+
+        &lt;form onSubmit={handleSubmit(onSubmit)} noValidate&gt;
+          {([&quot;fullName&quot;, &quot;email&quot;, &quot;password&quot;, &quot;confirmPassword&quot;] as const).map((name) =&gt; (
+            &lt;div className=&quot;mb-3&quot; key={name}&gt;
+              &lt;label className=&quot;form-label&quot;&gt;
+                {{ fullName: &quot;Full Name&quot;, email: &quot;Email&quot;, password: &quot;Password&quot;, confirmPassword: &quot;Confirm Password&quot; }[name]}
+              &lt;/label&gt;
+              &lt;input
+                type={name.toLowerCase().includes(&quot;password&quot;) ? &quot;password&quot; : name === &quot;email&quot; ? &quot;email&quot; : &quot;text&quot;}
+                className={`form-control ${errors[name] ? &quot;is-invalid&quot; : &quot;&quot;}`}
+                {...register(name)}
+              /&gt;
+              &lt;div className=&quot;invalid-feedback&quot;&gt;{errors[name]?.message}&lt;/div&gt;
+            &lt;/div&gt;
+          ))}
+          &lt;button className=&quot;btn btn-primary w-100&quot; disabled={isSubmitting}&gt;
+            {isSubmitting ? &quot;Creating...&quot; : &quot;Register&quot;}
+          &lt;/button&gt;
+        &lt;/form&gt;
+
+        &lt;p className=&quot;mt-3&quot;&gt;Have an account? &lt;Link to=&quot;/login&quot;&gt;Login&lt;/Link&gt;&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}
+</code></pre>
+<p>The <code>.map</code> over field names is a common React pattern: generating repeated markup from data instead of copy-pasting four nearly identical blocks.</p>
+<p><strong>src/pages/ProductListPage.tsx</strong></p>
+<pre><code class="language-tsx">import { useState } from &quot;react&quot;;
+import type { FormEvent } from &quot;react&quot;;
+import { Link } from &quot;react-router&quot;;
+import { useAuth } from &quot;../auth/AuthContext&quot;;
+import { useCategories, useDeleteProduct, useProducts } from &quot;../hooks/useProducts&quot;;
+import { getErrorMessage } from &quot;../utils/errorMessage&quot;;
+import type { Product, ProductQuery } from &quot;../types/product&quot;;
+
+export default function ProductListPage() {
+  const { isAdmin } = useAuth();
+  const [query, setQuery] = useState&lt;ProductQuery&gt;({ page: 1, pageSize: 5, sortDir: &quot;asc&quot; });
+  const [searchText, setSearchText] = useState(&quot;&quot;);
+
+  const { data, isPending, isError, error, isFetching } = useProducts(query);
+  const { data: categories = [] } = useCategories();
+  const deleteProduct = useDeleteProduct();
+
+  // Merge changes into the query; any filter change goes back to page 1
+  function updateQuery(changes: Partial&lt;ProductQuery&gt;) {
+    setQuery((q) =&gt; ({ ...q, page: 1, ...changes }));
+  }
+
+  function handleSearch(e: FormEvent) {
+    e.preventDefault();
+    updateQuery({ search: searchText.trim() });
+  }
+
+  function sort(column: string) {
+    setQuery((q) =&gt; ({
+      ...q,
+      sortBy: column,
+      sortDir: q.sortBy === column &amp;&amp; q.sortDir === &quot;asc&quot; ? &quot;desc&quot; : &quot;asc&quot;,
+    }));
+  }
+
+  function sortIcon(column: string) {
+    return query.sortBy !== column ? &quot;&quot; : query.sortDir === &quot;asc&quot; ? &quot;▲&quot; : &quot;▼&quot;;
+  }
+
+  function handleDelete(p: Product) {
+    if (confirm(`Delete &quot;${p.productName}&quot;?`)) deleteProduct.mutate(p.productId);
+  }
+
+  if (isPending) return &lt;p&gt;Loading products...&lt;/p&gt;;
+  if (isError) return &lt;div className=&quot;alert alert-danger&quot;&gt;{getErrorMessage(error)}&lt;/div&gt;;
+
+  const pages = Array.from({ length: data.totalPages }, (_, i) =&gt; i + 1);
+
+  return (
+    &lt;&gt;
+      &lt;div className=&quot;d-flex justify-content-between align-items-center mb-3&quot;&gt;
+        &lt;h3 className=&quot;mb-0&quot;&gt;
+          Products &lt;small className=&quot;text-muted fs-6&quot;&gt;({data.totalCount})&lt;/small&gt;
+          {isFetching &amp;&amp; &lt;span className=&quot;spinner-border spinner-border-sm ms-2&quot; /&gt;}
+        &lt;/h3&gt;
+        {isAdmin &amp;&amp; &lt;Link to=&quot;/products/new&quot; className=&quot;btn btn-primary&quot;&gt;+ New Product&lt;/Link&gt;}
+      &lt;/div&gt;
+
+      &lt;div className=&quot;row g-2 mb-3&quot;&gt;
+        &lt;form className=&quot;col-md-6&quot; onSubmit={handleSearch}&gt;
+          &lt;div className=&quot;input-group&quot;&gt;
+            &lt;input
+              className=&quot;form-control&quot;
+              placeholder=&quot;Search name or serial no...&quot;
+              value={searchText}
+              onChange={(e) =&gt; setSearchText(e.target.value)}
+            /&gt;
+            &lt;button className=&quot;btn btn-outline-secondary&quot;&gt;Search&lt;/button&gt;
+          &lt;/div&gt;
+        &lt;/form&gt;
+        &lt;div className=&quot;col-md-4&quot;&gt;
+          &lt;select
+            className=&quot;form-select&quot;
+            value={query.categoryId ?? &quot;&quot;}
+            onChange={(e) =&gt; updateQuery({ categoryId: e.target.value ? Number(e.target.value) : null })}
+          &gt;
+            &lt;option value=&quot;&quot;&gt;All categories&lt;/option&gt;
+            {categories.map((c) =&gt; (
+              &lt;option key={c.categoryId} value={c.categoryId}&gt;{c.categoryName}&lt;/option&gt;
+            ))}
+          &lt;/select&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      {deleteProduct.isError &amp;&amp; &lt;div className=&quot;alert alert-danger&quot;&gt;{getErrorMessage(deleteProduct.error)}&lt;/div&gt;}
+
+      &lt;div className=&quot;table-responsive&quot;&gt;
+        &lt;table className=&quot;table table-bordered table-striped align-middle&quot;&gt;
+          &lt;thead className=&quot;table-dark&quot;&gt;
+            &lt;tr&gt;
+              &lt;th&gt;Image&lt;/th&gt;
+              &lt;th role=&quot;button&quot; onClick={() =&gt; sort(&quot;name&quot;)}&gt;Name {sortIcon(&quot;name&quot;)}&lt;/th&gt;
+              &lt;th&gt;Serial No&lt;/th&gt;
+              &lt;th role=&quot;button&quot; onClick={() =&gt; sort(&quot;date&quot;)}&gt;Mfg Date {sortIcon(&quot;date&quot;)}&lt;/th&gt;
+              &lt;th&gt;Category&lt;/th&gt;
+              &lt;th role=&quot;button&quot; onClick={() =&gt; sort(&quot;price&quot;)}&gt;Price {sortIcon(&quot;price&quot;)}&lt;/th&gt;
+              &lt;th&gt;Available&lt;/th&gt;
+              &lt;th&gt;Brands&lt;/th&gt;
+              {isAdmin &amp;&amp; &lt;th&gt;Actions&lt;/th&gt;}
+            &lt;/tr&gt;
+          &lt;/thead&gt;
+          &lt;tbody&gt;
+            {data.items.map((p) =&gt; (
+              &lt;tr key={p.productId}&gt;
+                &lt;td&gt;&lt;img src={p.imageUrl} alt={p.productName} width={70} className=&quot;img-thumbnail&quot; /&gt;&lt;/td&gt;
+                &lt;td&gt;{p.productName}&lt;/td&gt;
+                &lt;td&gt;{p.serialNo}&lt;/td&gt;
+                &lt;td&gt;{new Date(p.manufacturingDate).toLocaleDateString()}&lt;/td&gt;
+                &lt;td&gt;{p.categoryName}&lt;/td&gt;
+                &lt;td&gt;{p.price.toLocaleString(undefined, { style: &quot;currency&quot;, currency: &quot;USD&quot; })}&lt;/td&gt;
+                &lt;td&gt;
+                  &lt;span className={`badge ${p.isAvailable ? &quot;bg-success&quot; : &quot;bg-secondary&quot;}`}&gt;
+                    {p.isAvailable ? &quot;Yes&quot; : &quot;No&quot;}
+                  &lt;/span&gt;
+                &lt;/td&gt;
+                &lt;td&gt;
+                  {p.brands.length === 0 ? (
+                    &lt;small className=&quot;text-muted&quot;&gt;None&lt;/small&gt;
+                  ) : (
+                    p.brands.map((b) =&gt; (
+                      &lt;div key={b.brandId}&gt;{b.brandName} &lt;small className=&quot;text-muted&quot;&gt;({b.stock})&lt;/small&gt;&lt;/div&gt;
+                    ))
+                  )}
+                &lt;/td&gt;
+                {isAdmin &amp;&amp; (
+                  &lt;td className=&quot;text-nowrap&quot;&gt;
+                    &lt;Link to={`/products/${p.productId}/edit`} className=&quot;btn btn-sm btn-warning me-1&quot;&gt;Edit&lt;/Link&gt;
+                    &lt;button className=&quot;btn btn-sm btn-danger&quot; onClick={() =&gt; handleDelete(p)} disabled={deleteProduct.isPending}&gt;
+                      Delete
+                    &lt;/button&gt;
+                  &lt;/td&gt;
+                )}
+              &lt;/tr&gt;
+            ))}
+            {data.items.length === 0 &amp;&amp; (
+              &lt;tr&gt;&lt;td colSpan={9} className=&quot;text-center text-muted&quot;&gt;No products found.&lt;/td&gt;&lt;/tr&gt;
+            )}
+          &lt;/tbody&gt;
+        &lt;/table&gt;
+      &lt;/div&gt;
+
+      {data.totalPages &gt; 1 &amp;&amp; (
+        &lt;nav&gt;
+          &lt;ul className=&quot;pagination&quot;&gt;
+            &lt;li className={`page-item ${!data.hasPrevious ? &quot;disabled&quot; : &quot;&quot;}`}&gt;
+              &lt;button className=&quot;page-link&quot; onClick={() =&gt; setQuery((q) =&gt; ({ ...q, page: q.page - 1 }))}&gt;Previous&lt;/button&gt;
+            &lt;/li&gt;
+            {pages.map((n) =&gt; (
+              &lt;li key={n} className={`page-item ${n === data.page ? &quot;active&quot; : &quot;&quot;}`}&gt;
+                &lt;button className=&quot;page-link&quot; onClick={() =&gt; setQuery((q) =&gt; ({ ...q, page: n }))}&gt;{n}&lt;/button&gt;
+              &lt;/li&gt;
+            ))}
+            &lt;li className={`page-item ${!data.hasNext ? &quot;disabled&quot; : &quot;&quot;}`}&gt;
+              &lt;button className=&quot;page-link&quot; onClick={() =&gt; setQuery((q) =&gt; ({ ...q, page: q.page + 1 }))}&gt;Next&lt;/button&gt;
+            &lt;/li&gt;
+          &lt;/ul&gt;
+        &lt;/nav&gt;
+      )}
+    &lt;/&gt;
+  );
+}
+</code></pre>
+<p><strong>How the list reacts to changes:</strong> when <code>query</code> changes (new page, sort or filter), <code>useProducts(query)</code> gets a new query key. TanStack Query fetches the new data automatically, and <code>keepPreviousData</code> keeps the old rows visible (with a small spinner) until it arrives.</p>
+<p><strong>src/pages/ProductCreatePage.tsx</strong></p>
+<pre><code class="language-tsx">import { useNavigate } from &quot;react-router&quot;;
+import ProductForm from &quot;../components/ProductForm&quot;;
+import type { ProductFormValues } from &quot;../components/ProductForm&quot;;
+import { useCreateProduct } from &quot;../hooks/useProducts&quot;;
+import { getErrorMessage } from &quot;../utils/errorMessage&quot;;
+
+export default function ProductCreatePage() {
+  const navigate = useNavigate();
+  const createProduct = useCreateProduct();
+
+  function handleSubmit(values: ProductFormValues) {
+    createProduct.mutate(values, { onSuccess: () =&gt; navigate(&quot;/products&quot;) });
+  }
+
+  return (
+    &lt;&gt;
+      &lt;h3 className=&quot;mb-3&quot;&gt;Create Product&lt;/h3&gt;
+      {createProduct.isError &amp;&amp; &lt;div className=&quot;alert alert-danger&quot;&gt;{getErrorMessage(createProduct.error)}&lt;/div&gt;}
+      &lt;ProductForm onSubmit={handleSubmit} isSubmitting={createProduct.isPending} submitText=&quot;Create&quot; /&gt;
+    &lt;/&gt;
+  );
+}
+</code></pre>
+<p><strong>src/pages/ProductEditPage.tsx</strong></p>
+<pre><code class="language-tsx">import { useNavigate, useParams } from &quot;react-router&quot;;
+import ProductForm from &quot;../components/ProductForm&quot;;
+import type { ProductFormValues } from &quot;../components/ProductForm&quot;;
+import { useProduct, useUpdateProduct } from &quot;../hooks/useProducts&quot;;
+import { getErrorMessage } from &quot;../utils/errorMessage&quot;;
+
+export default function ProductEditPage() {
+  const { id } = useParams();
+  const productId = Number(id);
+  const navigate = useNavigate();
+
+  const { data: product, isPending, isError, error } = useProduct(productId);
+  const updateProduct = useUpdateProduct();
+
+  if (isPending) return &lt;p&gt;Loading product...&lt;/p&gt;;
+  if (isError) return &lt;div className=&quot;alert alert-danger&quot;&gt;{getErrorMessage(error)}&lt;/div&gt;;
+
+  // Map the API response to the form's shape
+  const defaultValues: ProductFormValues = {
+    productName: product.productName,
+    manufacturingDate: product.manufacturingDate,
+    serialNo: product.serialNo,
+    imageFileName: product.imageFileName,
+    isAvailable: product.isAvailable,
+    categoryId: product.categoryId,
+    price: product.price,
+    brands: product.brands.map((b) =&gt; ({ brandName: b.brandName, stock: b.stock })),
+  };
+
+  function handleSubmit(values: ProductFormValues) {
+    updateProduct.mutate({ id: productId, product: values }, { onSuccess: () =&gt; navigate(&quot;/products&quot;) });
+  }
+
+  return (
+    &lt;&gt;
+      &lt;h3 className=&quot;mb-3&quot;&gt;Edit Product&lt;/h3&gt;
+      {updateProduct.isError &amp;&amp; &lt;div className=&quot;alert alert-danger&quot;&gt;{getErrorMessage(updateProduct.error)}&lt;/div&gt;}
+      &lt;ProductForm
+        defaultValues={defaultValues}
+        initialImageUrl={product.imageUrl}
+        onSubmit={handleSubmit}
+        isSubmitting={updateProduct.isPending}
+        submitText=&quot;Save Changes&quot;
+      /&gt;
+    &lt;/&gt;
+  );
+}
+</code></pre>
+<p>The form renders only <strong>after</strong> the product has loaded, because form libraries read <code>defaultValues</code> once, when the form is created.</p>
+<h2 id="39-app-and-entry-point">3.9 App and entry point</h2>
+<p><strong>src/App.tsx</strong></p>
+<pre><code class="language-tsx">import { lazy, Suspense } from &quot;react&quot;;
+import { Navigate, Route, Routes } from &quot;react-router&quot;;
+import Navbar from &quot;./components/Navbar&quot;;
+import { RequireAdmin } from &quot;./auth/RequireAdmin&quot;;
+import ProductListPage from &quot;./pages/ProductListPage&quot;;
+import LoginPage from &quot;./pages/LoginPage&quot;;
+import RegisterPage from &quot;./pages/RegisterPage&quot;;
+
+// Lazy-loaded: these pages' code downloads only when an admin opens them
+const ProductCreatePage = lazy(() =&gt; import(&quot;./pages/ProductCreatePage&quot;));
+const ProductEditPage = lazy(() =&gt; import(&quot;./pages/ProductEditPage&quot;));
+
+export default function App() {
+  return (
+    &lt;&gt;
+      &lt;Navbar /&gt;
+      &lt;main className=&quot;container&quot;&gt;
+        &lt;Suspense fallback={&lt;p&gt;Loading page...&lt;/p&gt;}&gt;
+          &lt;Routes&gt;
+            &lt;Route path=&quot;/&quot; element={&lt;Navigate to=&quot;/products&quot; replace /&gt;} /&gt;
+            &lt;Route path=&quot;/login&quot; element={&lt;LoginPage /&gt;} /&gt;
+            &lt;Route path=&quot;/register&quot; element={&lt;RegisterPage /&gt;} /&gt;
+            &lt;Route path=&quot;/products&quot; element={&lt;ProductListPage /&gt;} /&gt;
+            &lt;Route path=&quot;/products/new&quot; element={&lt;RequireAdmin&gt;&lt;ProductCreatePage /&gt;&lt;/RequireAdmin&gt;} /&gt;
+            &lt;Route path=&quot;/products/:id/edit&quot; element={&lt;RequireAdmin&gt;&lt;ProductEditPage /&gt;&lt;/RequireAdmin&gt;} /&gt;
+            &lt;Route path=&quot;*&quot; element={&lt;Navigate to=&quot;/products&quot; replace /&gt;} /&gt;
+          &lt;/Routes&gt;
+        &lt;/Suspense&gt;
+      &lt;/main&gt;
+    &lt;/&gt;
+  );
+}
+</code></pre>
+<p><strong>src/main.tsx</strong></p>
+<pre><code class="language-tsx">import { StrictMode } from &quot;react&quot;;
+import { createRoot } from &quot;react-dom/client&quot;;
+import { BrowserRouter } from &quot;react-router&quot;;
+import { QueryClient, QueryClientProvider } from &quot;@tanstack/react-query&quot;;
+import &quot;bootstrap/dist/css/bootstrap.min.css&quot;;
+import App from &quot;./App&quot;;
+import { AuthProvider } from &quot;./auth/AuthProvider&quot;;
+
+const queryClient = new QueryClient();
+
+createRoot(document.getElementById(&quot;root&quot;)!).render(
+  &lt;StrictMode&gt;
+    &lt;QueryClientProvider client={queryClient}&gt;
+      &lt;BrowserRouter&gt;
+        &lt;AuthProvider&gt;
+          &lt;App /&gt;
+        &lt;/AuthProvider&gt;
+      &lt;/BrowserRouter&gt;
+    &lt;/QueryClientProvider&gt;
+  &lt;/StrictMode&gt;
+);
+</code></pre>
+<p><strong>Providers wrap the app</strong> so any component inside can use their hooks: <code>useQuery</code> needs <code>QueryClientProvider</code>, <code>useNavigate</code> needs <code>BrowserRouter</code>, and <code>useAuth</code> needs <code>AuthProvider</code>.</p>
+<p><strong>StrictMode</strong> renders components twice in development, to expose bugs. That's why you may see two identical requests in the Network tab while developing. Production renders once.</p>
+<h2 id="310-run-it">3.10 Run it</h2>
+<p>Start the API, then:</p>
+<pre><code class="language-bash">npm run dev
+</code></pre>
+<p>Open <code>http://localhost:5173</code>.</p>
+<p>Work through the same checklist as Angular (section 2.13). Then commit.</p>
+<hr />
+<h1 id="part-4-after-it-works">PART 4 — After it works</h1>
+<h2 id="41-compare-what-you-built">4.1 Compare what you built</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Angular</th>
+<th>React</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Shared login state</td>
+<td><code>AuthService</code> + signals</td>
+<td><code>AuthProvider</code> + Context</td>
+</tr>
+<tr>
+<td>Fetching a list</td>
+<td>Service → <code>subscribe</code> → <code>signal.set()</code></td>
+<td><code>useQuery</code> (caching built in)</td>
+</tr>
+<tr>
+<td>After saving</td>
+<td>Call <code>load()</code> again</td>
+<td><code>invalidateQueries</code> → automatic refetch</td>
+</tr>
+<tr>
+<td>Forms</td>
+<td>Reactive Forms + <code>FormArray</code></td>
+<td>React Hook Form + Zod + <code>useFieldArray</code></td>
+</tr>
+<tr>
+<td>Route protection</td>
+<td><code>CanActivateFn</code></td>
+<td><code>&lt;RequireAdmin&gt;</code> wrapper</td>
+</tr>
+<tr>
+<td>Token refresh</td>
+<td><code>HttpInterceptorFn</code> + RxJS</td>
+<td>axios interceptor + a Promise</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>The architecture is identical.</strong> UI → state → API layer → interceptor → REST API. Only the syntax differs. Once you see that, learning any new framework (Vue, Svelte, Blazor) becomes much faster.</p>
+<h2 id="42-production-builds">4.2 Production builds</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>App</th>
+<th>Command</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API</td>
+<td><code>dotnet publish -c Release</code></td>
+<td><code>bin/Release/net10.0/publish/</code></td>
+</tr>
+<tr>
+<td>Angular</td>
+<td><code>ng build</code></td>
+<td><code>dist/product-angular/browser/</code> (static files)</td>
+</tr>
+<tr>
+<td>React</td>
+<td><code>npm run build</code></td>
+<td><code>dist/</code> (static files)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Both clients become <strong>static files</strong> (HTML, JS, CSS). They can be hosted on any web server or CDN, or served from the API's <code>wwwroot</code>.</p>
+<h2 id="43-common-problems-all-three-parts">4.3 Common problems (all three parts)</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Problem</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CORS error in the browser console</td>
+<td>Client origin missing from <code>Cors:AllowedOrigins</code>, or <code>UseCors</code> in the wrong place</td>
+</tr>
+<tr>
+<td><code>ERR_CERT_AUTHORITY_INVALID</code></td>
+<td>Run <code>dotnet dev-certs https --trust</code></td>
+</tr>
+<tr>
+<td>"Cannot reach the server"</td>
+<td>API not running, or the wrong port in <code>environment.ts</code> / <code>.env</code></td>
+</tr>
+<tr>
+<td>401 on every admin call</td>
+<td>Token missing or expired; check the <code>Authorization</code> header in DevTools → Network</td>
+</tr>
+<tr>
+<td>403 as admin</td>
+<td>Logged in before the role existed; log out and in again</td>
+</tr>
+<tr>
+<td>409 on save</td>
+<td>Duplicate serial number</td>
+</tr>
+<tr>
+<td>400 with <code>errors</code></td>
+<td>Validation; compare the field names with the DTO</td>
+</tr>
+<tr>
+<td>App won't start: Jwt Key</td>
+<td>User Secret missing or shorter than 32 characters</td>
+</tr>
+<tr>
+<td>Images broken</td>
+<td><code>UseStaticFiles</code> missing, or <code>wwwroot/images</code> doesn't exist</td>
+</tr>
+<tr>
+<td>Category stays "not selected"</td>
+<td>Angular: use <code>[ngValue]</code>; React: use <code>valueAsNumber</code></td>
+</tr>
+<tr>
+<td>List doesn't refresh after save</td>
+<td>Angular: call <code>load()</code>; React: <code>invalidateQueries(["products"])</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="44-your-next-learning-steps-in-order">4.4 Your next learning steps (in order)</h2>
+<ol>
+<li><strong>Testing</strong><ul>
+<li>API: xUnit + <code>WebApplicationFactory</code> integration tests.</li>
+<li>Angular/React: Vitest unit tests.</li>
+<li>End-to-end: Playwright tests that click through the real app.</li>
+</ul>
+</li>
+<li><strong>Docker:</strong> containerize the API + SQL Server with <code>docker compose</code>, so anyone can run your project with one command.</li>
+<li><strong>CI/CD:</strong> a GitHub Actions workflow that builds and tests all three apps on every push.</li>
+<li><strong>Deployment:</strong><ul>
+<li>API to Azure App Service (or a container host) with Azure SQL.</li>
+<li>Clients to Azure Static Web Apps, Netlify or Vercel.</li>
+<li>Secrets from environment variables.</li>
+</ul>
+</li>
+<li><strong>Security, deeper:</strong> refresh token in an HttpOnly cookie, the OWASP Top 10, email confirmation and password reset.</li>
+<li><strong>Styling:</strong> Tailwind CSS, Angular Material, or shadcn/ui for React.</li>
+<li><strong>Advanced state:</strong> NgRx Signal Store (Angular), Zustand (React) for complex client state.</li>
+<li><strong>Observability:</strong> Serilog structured logs, OpenTelemetry tracing.</li>
+<li><strong>Next.js (React)</strong> and <strong>Angular SSR</strong>, for server-side rendering and SEO.</li>
+</ol>
+<p><strong>One habit above all:</strong> keep the browser DevTools <strong>Network</strong> tab open while you develop. Every request, header, status code and JSON body is there. It's the fastest way to understand and debug the whole stack.</p></main>
+</div>
+<button class="menu-btn" id="menuBtn">☰ Contents</button>
+<button class="theme-btn" id="themeBtn">◐ Theme</button>
+<script>
+document.querySelectorAll('pre').forEach(function(pre) {
+  var b = document.createElement('button'); b.className = 'copy'; b.textContent = 'Copy';
+  b.addEventListener('click', function() {
+    var t = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
+    navigator.clipboard.writeText(t).then(function() { b.textContent = 'Copied!'; setTimeout(function() { b.textContent = 'Copy'; }, 1500); });
+  });
+  pre.appendChild(b);
+});
+var root = document.documentElement;
+try { var saved = localStorage.getItem('theme'); if (saved) root.setAttribute('data-theme', saved); } catch (e) {}
+document.getElementById('themeBtn').addEventListener('click', function() {
+  var cur = root.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  var next = cur === 'dark' ? 'light' : 'dark'; root.setAttribute('data-theme', next);
+  try { localStorage.setItem('theme', next); } catch (e) {}
+});
+var toc = document.getElementById('toc');
+document.getElementById('menuBtn').addEventListener('click', function() { toc.classList.toggle('open'); });
+toc.addEventListener('click', function(e) { if (e.target.tagName === 'A') toc.classList.remove('open'); });
+document.querySelectorAll('li.task input').forEach(function(cb, i) {
+  try { cb.checked = localStorage.getItem('task-' + i) === '1'; } catch (e) {}
+  cb.addEventListener('change', function() { try { localStorage.setItem('task-' + i, cb.checked ? '1' : '0'); } catch (e) {} });
+});
+</script>
+</body>
+</html>
